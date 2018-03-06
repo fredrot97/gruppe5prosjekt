@@ -45,10 +45,10 @@ class UserService {
     });
   }
 
-  addUser(nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, callback) {
-    connection.query('INSERT INTO Users (firstName, lastName, address, email, phonenumber) values (?, ?, ?, ?, ?)', [nFirstname, nLastname, nAddress, nEmail1, nPhonenumber], (error, result) => {
+  addUser(nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1, callback) {
+    connection.query('INSERT INTO Users (firstName, lastName, address, email, phonenumber, password) values (?, ?, ?, ?, ?, ?)', [nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1], (error, result) => {
       if (error) throw error;
-
+      
       callback();
     });
   }
@@ -56,3 +56,4 @@ class UserService {
 let userService = new UserService();
 
 export { UserService };
+export { userService };
