@@ -5,9 +5,9 @@ let connection;
 function connect() {
   connection = mysql.createConnection({
     host: 'mysql.stud.iie.ntnu.no',
-    user: 'g_oops_5',
-    password: '6nyGiWr1',
-    database: 'g_oops_5'
+    user: '',
+    password: '',
+    database: ''
   });
 
   // Connect to MySQL-server
@@ -48,7 +48,7 @@ class UserService {
   addUser(nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1, callback) {
     connection.query('INSERT INTO Users (firstName, lastName, address, email, phonenumber, password) values (?, ?, ?, ?, ?, ?)', [nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1], (error, result) => {
       if (error) throw error;
-      
+
       callback();
     });
   }
