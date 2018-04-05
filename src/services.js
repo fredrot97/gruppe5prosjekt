@@ -5,9 +5,9 @@ let connection;
 function connect() {
   connection = mysql.createConnection({
     host: "mysql.stud.iie.ntnu.no",
-    user: "",
-    password: "",
-    database: ""
+    user: "g_oops_5",
+    password: "6nyGiWr1",
+    database: "g_oops_5"
   });
 
   // Connect to MySQL-server
@@ -40,6 +40,13 @@ class User {
   }
 }
 class UserService {
+  addEvent(nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nMap, nEquipmentlist, callback) {
+    connection.query("INSERT INTO Arrangement (Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nEquipmentlist, nMap], (error, result) => {
+      if (error) throw error;
+
+      callback();
+    });
+  }
   signIn(inputEmail, inputPassword, callback) {
       connection.query("SELECT * FROM Users WHERE email=? AND password=?", [inputEmail,inputPassword], (error, result) => {
         let user = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
@@ -118,7 +125,9 @@ class UserService {
 
     });
   }
+
 }
+
 let userService = new UserService();
 
 export { userService };

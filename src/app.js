@@ -29,7 +29,6 @@ import { userService } from "./services.js";
         <Link to="/createUser/">Ny bruker</Link>
       </div>
       </div>
-
     );
   }
   componentDidMount() {
@@ -178,30 +177,179 @@ class Arrangements extends React.Component {
   constructor(props) {
     super(props);
 
-    var user = userService.getSignedInUser();
-    this.user = user;
   }
 
   render() {
     return(
       <div>
-    <nav>
-      <ul>
-        <li>
+      <div>
+        <Link to="/">Tilbake til login</Link>
+      </div>
+      <div>
+        <h1>Opprett arrangement</h1>
 
-        </li>
-        <li>
-          <h2>Arrangementer</h2>
-        </li>
-        <li>
-          <Link to="/OtherUsers/">Søk opp medlem</Link>
-        </li>
-      </ul>
-    </nav>
+        <h2>Navn på arrangement:</h2>
+          <input type="text" ref="nEventname" />
+          <div id="EventnameError"></div>
+        <h2>Beskrivelse:</h2>
+          <input type="text" ref="nDescription" />
+          <div id="DescriptionError"></div>
+          </div>
+        <h2>Møtepunkt:</h2>
+          <input type="text" ref="nMeetingpoint" />
+          <div id="MeetingpointError"></div>
+        <h2>Kontaktperson:</h2>
+          <input type="text" ref="nContactperson" />
+          <div id="ContactpersonError"></div>
+        <h2>Telefonnummer kontaktperson:</h2>
+          <input type="text" ref="nPhonenumberContactperson" />
+          <div id="PhonenumberContactpersonError"></div>
+        <h2>Dato:</h2>
+          <input type="date" ref="nDate" />
+          <div id="DateError"></div>
+        <h2>Start- og slutt tid:</h2>
+          <input type="time" ref="nStartTime" />
+          <div id="StartTimeError"></div>
+          <input type="time" ref="nEndTime" />
+          <div id="EndTimeError"></div>
+        <h2>Link til kart:</h2>
+          <input type="text" ref="nMap" />
+          <div id="MapError"></div>
+        <h2>Utstyrsliste:</h2>
+          <input type="text" ref="nEquipmentlist" />
+          <div id="EquipmentlistError"></div>
+        <h2>Adresse:</h2>
+          <input type="text" ref="nEventAdress" />
+          <div id="EventAdress"></div>
+          <div id="addEventError"></div>
+        <button ref="addEventButton">Opprett arrangement</button>
+</div>
+);
+  }
+  componentDidMount() {
+    this.refs.addEventButton.onclick = () => {
+      let isValidInput = true;
+      if(!isNaN(this.refs.nEventname.value) || this.refs.nEventname.value == "") {
+        isValidInput = false;
+        document.getElementById("EventnameError").textContent = "This is not a valid name.";
+      } else {
+        document.getElementById("EventnameError").textContent = "";
+      }
+      //Sjekker om innskrevet navn inneholder tall eller om boksen er tom
+      //Fiks funksjonen slik at man ikke kan skrive inn tall med bokstaver
+      if(!isNaN(this.refs.nDescription.value) || this.refs.nDescription.value == "") {
+        isValidInput = false;
+        document.getElementById("DescriptionError").textContent = "This is not a valid name.";
+      } else {
+        document.getElementById("DescriptionError").textContent = "";
+      }
+      //Sjekker om innskrevet navn inneholder tall eller om boksen er tom
+      //Fiks funksjonen slik at man ikke kan skrive inn tall med bokstaver
+      if(this.refs.nMeetingpoint.value == "") {
+        isValidInput = false;
+        document.getElementById("MeetingpointError").textContent = "This is not a valid meeting point."
+      } else {
+        document.getElementById("MeetingpointError").textContent = "";
+      }
+
+      if(this.refs.nContactperson.value == "") {
+        isValidInput = false;
+          document.getElementById("ContactpersonError").textContent = "Please fill in a valid name";
+      } else {
+        document.getElementById("ContactpersonError").textContent = "";
+      }
+
+
+      //*Framtidige funksjoner: sjekke at emailen ikke allerede eksisterer
+      //*Framtidige funksjoner: sjekke at emailen inneholder riktige tegn, f.eks. @
+      if(isNaN(this.refs.nPhonenumberContactperson.value) || this.refs.nPhonenumberContactperson.value == "") {
+        isValidInput = false;
+        document.getElementById("PhonenumberContactpersonError").textContent = "This is not a valid phonenumber.";
+      } else {
+        document.getElementById("PhonenumberContactpersonError").textContent = "";
+      }
+
+      //Sjekker om nummer kun inneholder tall og om boksen er tom
+      //*Framtidige funksjoner: Sjekke at nummeret er 8 siffer langt
+
+      if(this.refs.nDate.value == "") {
+        isValidInput = false;
+          document.getElementById("DateError").textContent = "Please fill in a valid date";
+      } else {
+        document.getElementById("DateError").textContent = "";
+      }
+
+      if(this.refs.nStartTime.value == "") {
+        isValidInput = false;
+          document.getElementById("StartTimeError").textContent = "Please fill in a valid start time";
+      } else {
+        document.getElementById("StartTimeError").textContent = "";
+      }
+
+      if(this.refs.nEndTime.value == "") {
+        isValidInput = false;
+          document.getElementById("EndTimeError").textContent = "Please fill in a valid end time";
+      } else {
+        document.getElementById("EndTimeError").textContent = "";
+      }
+
+      if(this.refs.nMap.value == "") {
+        isValidInput = false;
+          document.getElementById("MapError").textContent = "Please fill in a valid map link";
+      } else {
+        document.getElementById("MapError").textContent = "";
+      }
+
+      if(this.refs.nEquipmentlist.value == "") {
+        isValidInput = false;
+          document.getElementById("EquipmentlistError").textContent = "Please fill in a valid equipment list";
+      } else {
+        document.getElementById("EquipmentlistError").textContent = "";
+      }
+
+
+      if(isValidInput == true) {
+        history.replace("/EventConfirmation/");
+        userService.addEvent(this.refs.nEventname.value, this.refs.nDescription.value,
+                             this.refs.nMeetingpoint.value, this.refs.nContactperson.value,
+                             this.refs.nPhonenumberContactperson.value, this.refs.nDate.value,
+                             this.refs.nStartTime.value, this.refs.nEndTime.value,
+                             this.refs.nMap.value, this.refs.nEquipmentlist.value, (result) => {
+
+
+      });
+    } else {
+      document.getElementById("addEventError").textContent = "Please fill out missing spaces.";
+    }
+    //Om ingen av feltene er feil vil brukeren bli opprette, men dersom det er feil vil brukeren måtte rette opp i disse
+    //Framtidige funksjoner: Brukeren blir tatt til sin profil/epost bekreftelse ved vellykket brukerdannelse
+
+  };
+}
+}
+
+class EventConfirmation extends React.Component {
+  constructor() {
+    super(); // Call React.Component constructor
+
+    this.users = [];
+  }
+
+render() {
+  return (
+    <div>
+    <div>
+      <Link to="/">Tilbake til login</Link>
     </div>
-  )
+    <div>
+    <h2>Arrangementet ditt har blitt lagt inn!</h2>
+    <h4>Du vil motta en email når søknaden din har blitt behandlet.</h4>
+    </div>
+    </div>
+    );
   }
 }
+
 
 class UserProfileAdmin extends React.Component {
 constructor(props) {
