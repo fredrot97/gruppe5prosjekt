@@ -64,7 +64,7 @@ import { userService } from "./services.js";
 
 class UserProfile extends React.Component {
 constructor(props) {
-  super(props); // Call React.Component constructor
+  super(props);
 
   var user = userService.getSignedInUser();
   this.user = user;
@@ -117,7 +117,7 @@ render() {
 
 class ChangeProfile extends React.Component{
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -125,6 +125,9 @@ class ChangeProfile extends React.Component{
   render() {
     return (
       <div>
+      <div>
+      <button ref="backToProfileButton">Din profil</button>
+      </div>
       <div>
       <h2>Fornavn: {this.user.firstName}</h2>
       <input type="text" ref="changeFirstName" />
@@ -151,12 +154,15 @@ class ChangeProfile extends React.Component{
        history.replace("/changeProfileSuccess/");
      });
      }
+     this.refs.backToProfileButton.onclick = () => {
+       history.replace("/profile/:" + user.email + "");
+     }
     }
 }
 
 class ChangeProfileSuccess extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -196,6 +202,7 @@ class OtherUsers extends React.Component {
       <div>
       <h2>Søk opp bruker:</h2>
       <input type="text" ref="inputSearch"></input>
+      <button ref="searchUserButton">Søk</button>
       </div>
       </div>
     )
@@ -211,7 +218,7 @@ class OtherUsers extends React.Component {
 
 class UserProfileAdmin extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -263,7 +270,7 @@ render() {
 }
 class ChangeAdminProfile extends React.Component{
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -271,6 +278,9 @@ class ChangeAdminProfile extends React.Component{
   render() {
     return (
       <div>
+      <div>
+      <button ref="backToAdminProfileButton">Din profil</button>
+      </div>
       <div>
       <h2>Fornavn: {this.user.firstName}</h2>
       <input type="text" ref="changeFirstName" />
@@ -297,12 +307,15 @@ class ChangeAdminProfile extends React.Component{
        history.replace("/changeAdminProfileSuccess/");
      });
      }
+     this.refs.backToAdminProfileButton.onclick = () => {
+       history.replace("/profile/admin/:" + user.email + "");
+     }
     }
 }
 
 class ChangeAdminProfileSuccess extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -328,12 +341,21 @@ class ChangeAdminProfileSuccess extends React.Component {
 }
 class UsersDisplay extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
+    this.users = [];
   }
   render() {
+    let listUsers = [];
+    for(let user of this.users) {
+      listUsers.push(
+        <li key={user.ID}>
+          <Link to={"/profileAdminAccess/" + user.ID + ""}>{user.firstName, user.lastName}</Link>
+        </li>
+      );
+    }
     return(
       <div>
       <div>
@@ -341,7 +363,9 @@ class UsersDisplay extends React.Component {
       </div>
       <div>
       <h2>Aktive brukere:</h2>
-      <h4>~Liste~</h4>
+        <ul>{listUsers}</ul>
+      </div>
+      <div>
       <h2>Inaktive brukere:</h2>
       <h4>~Liste~</h4>
       </div>
@@ -354,12 +378,62 @@ class UsersDisplay extends React.Component {
     this.refs.backToAdminProfileButton.onclick = () => {
       history.replace("/profile/admin/:" + user.email + "");
     }
+    userService.getUsers( (result) => {
+      this.users = result;
+      this.forceUpdate();
+    });
   }
+  }
+
+class ProfileAdminAccess extends React.Component {
+    constructor(props) {
+      super(props);
+
+      this.user = [];
+  }
+
+  render() {
+      return(
+        <div>
+        <div>
+          <button ref="adminEventButton">Arrangementer</button>
+          <button ref="userDisplayButton">Brukere </button>
+          <button ref="newUserDisplayButton">Nye brukere</button>
+        </div>
+        <div>
+        <h2>Fornavn: {this.user.firstName}</h2>
+        <h2>Etternavn: {this.user.lastName}</h2>
+
+        <h2>Addresse: {this.user.address}</h2>
+        <h2>Telefonnummer: {this.user.phonenumber}</h2>
+
+
+        <h2>Kompetanse: </h2>
+        </div>
+        </div>
+      )
+    }
+    componentDidMount() {
+      userService.getUser((this.props.location.pathname.substring(20)), (nUser) => {
+        this.user = nUser;
+        console.log(nUser);
+        this.forceUpdate();
+      });
+      this.refs.adminEventButton.onclick = () => {
+          history.replace("/adminEvents/");
+        }
+      this.refs.newUserDisplayButton.onclick = () => {
+          history.replace("/newUsersDisplay/");
+        }
+      this.refs.userDisplayButton.onclick = () => {
+          history.replace("/usersDisplay/");
+        }
+    }
   }
 
 class NewUsersDisplay extends React.Component {
     constructor(props) {
-      super(props); // Call React.Component constructor
+      super(props);
 
       var user = userService.getSignedInUser();
       this.user = user;
@@ -383,17 +457,27 @@ class NewUsersDisplay extends React.Component {
       this.refs.backToAdminProfileButton.onclick = () => {
         history.replace("/profile/admin/:" + user.email + "");
       }
+
     }
     }
 
 class AdminEvents extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
+    this.events = [];
   }
   render() {
+    let listEvents = [];
+    for(let event of this.events) {
+      listEvents.push(
+        <li key={event.ID}>
+          <Link to={"/eventDetails/" + event.ID + ""}>{event.Arrangement_Name}</Link>
+        </li>
+      );
+    }
     return(
       <div>
       <div>
@@ -404,10 +488,18 @@ class AdminEvents extends React.Component {
       <h2>Arrangementer:</h2>
       <h4>~Liste~</h4>
       </div>
+      <div>
+        <ul>{listEvents}</ul>
+      </div>
       </div>
     )
   }
+
   componentDidMount() {
+    userService.getEvents((result) => {
+      this.events = result;
+      this.forceUpdate();
+    });
     var user = userService.getSignedInUser();
     this.user = user;
     this.refs.backToAdminProfileButton.onclick = () => {
@@ -445,6 +537,63 @@ for(let user of this.users) {
   );
 }
 */
+
+class EventDetails extends React.Component {
+  constructor(props) {
+    super(props);
+
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.event = [];
+  }
+  render() {
+    console.log(this.event);
+    return(
+      <div>
+      <div>
+      <button ref="backToAdminProfileButton">Din profil</button>
+      <button ref="backToAdminEventsButton">Arrangementer</button>
+      </div>
+      <div>
+      <h2>{this.event.arrangement_Name}</h2>
+      <h3>Beskrivelse:</h3>
+      <h4>{this.event.description}</h4>
+      <h3>Møtested:</h3>
+      <h4>{this.event.meetingpoint}</h4>
+      <h3>Kontaktperson:</h3>
+      <h4>{this.event.contact_name}</h4>
+      <h4>{this.event.contact_phonenumber}</h4>
+      <h3>Dato:</h3>
+      <h4>*mangler*</h4>
+      <h3>Tid:</h3>
+      <h4>{this.event.start_time}</h4>
+      <h4>{this.event.end_time}</h4>
+      <h3>Utstyrsliste:</h3>
+      <h4>{this.event.equipmentlist}</h4>
+      <h3>Kartlenke:</h3>
+      <h4>{this.event.map_link}</h4>
+      </div>
+      </div>
+    )
+  }
+
+  componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToAdminEventsButton.onclick = () => {
+      history.replace("/adminEvents/");
+    }
+    this.refs.backToAdminProfileButton.onclick = () => {
+      history.replace("/profile/admin/:" + user.email + "");
+    }
+    userService.getEvent((this.props.location.pathname.substring(14)), (arrangement) => {
+      this.event = arrangement;
+      console.log(arrangement);
+      this.forceUpdate();
+    });
+  }
+  }
+
 class Events extends React.Component {
   constructor(props) {
     super(props);
@@ -455,7 +604,15 @@ class Events extends React.Component {
     this.events = [];
   }
 
-  render() {
+  render()  {
+    let listEvents = [];
+    for(let event of this.events) {
+      listEvents.push(
+        <li key={event.ID}>
+          <Link to={"/userEventDetails/" + event.ID + ""}>{event.Arrangement_Name}</Link>
+        </li>
+      );
+    }
     return(
       <div>
       <div>
@@ -465,10 +622,17 @@ class Events extends React.Component {
       <h2>Arrangementer:</h2>
       <h4>~Liste~</h4>
       </div>
+      <div>
+        <ul>{listEvents}</ul>
+      </div>
       </div>
     )
   }
   componentDidMount () {
+    userService.getEvents((result) => {
+      this.events = result;
+      this.forceUpdate();
+    });
     var user = userService.getSignedInUser();
     this.user = user;
     this.refs.backToProfileButton.onclick = () => {
@@ -489,23 +653,62 @@ class Events extends React.Component {
       <ul>{listEvents}</ul>
   */
 }
-class DisplayEvent extends React.Component {
+
+class UserEventDetails extends React.Component {
   constructor(props) {
     super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
+    this.event = [];
   }
   render() {
+    console.log(this.event);
     return(
       <div>
       <div>
-
+      <button ref="backToProfileButton">Din profil</button>
+      <button ref="backToEventsButton">Arrangementer</button>
+      </div>
+      <div>
+      <h2>{this.event.arrangement_Name}</h2>
+      <h3>Beskrivelse:</h3>
+      <h4>{this.event.description}</h4>
+      <h3>Møtested:</h3>
+      <h4>{this.event.meetingpoint}</h4>
+      <h3>Kontaktperson:</h3>
+      <h4>{this.event.contact_name}</h4>
+      <h4>{this.event.contact_phonenumber}</h4>
+      <h3>Dato:</h3>
+      <h4>*mangler*</h4>
+      <h3>Tid:</h3>
+      <h4>{this.event.start_time}</h4>
+      <h4>{this.event.end_time}</h4>
+      <h3>Utstyrsliste:</h3>
+      <h4>{this.event.equipmentlist}</h4>
+      <h3>Kartlenke:</h3>
+      <h4>{this.event.map_link}</h4>
       </div>
       </div>
     )
   }
-}
+
+  componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToEventsButton.onclick = () => {
+      history.replace("/events/");
+    }
+    this.refs.backToProfileButton.onclick = () => {
+      history.replace("/profile/:" + user.email + "");
+    }
+    userService.getEvent((this.props.location.pathname.substring(18)), (arrangement) => {
+      this.event = arrangement;
+      console.log(arrangement);
+      this.forceUpdate();
+    });
+  }
+  }
 
 class CreateEvent extends React.Component {
   constructor(props) {
@@ -662,8 +865,7 @@ class CreateEvent extends React.Component {
     } else {
       document.getElementById("addEventError").textContent = "Please fill out missing spaces.";
     }
-    //Om ingen av feltene er feil vil brukeren bli opprette, men dersom det er feil vil brukeren måtte rette opp i disse
-    //Framtidige funksjoner: Brukeren blir tatt til sin profil/epost bekreftelse ved vellykket brukerdannelse
+    //Om ingen av feltene er feil vil brukeren bli opprettet, men dersom det er feil vil brukeren måtte rette opp i disse
 
   };
 }
@@ -671,7 +873,7 @@ class CreateEvent extends React.Component {
 
 class EventConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -699,7 +901,7 @@ render() {
 
 class ForgottenPassword extends React.Component {
 constructor() {
-  super(); // Call React.Component constructor
+  super();
 
   this.users = [];
 }
@@ -880,7 +1082,7 @@ class CreateUser extends React.Component {
 }
 class UserConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -907,7 +1109,7 @@ render() {
 
 class PasswordConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -947,9 +1149,12 @@ ReactDOM.render((
         <Route exact path="/changeAdminProfileSuccess/" component={ChangeAdminProfileSuccess} />
         <Route exact path="/otherUsers/" component={OtherUsers} />
         <Route exact path="/usersDisplay/" component={UsersDisplay} />
+        <Route exact path="/profileAdminAccess/:id" component={ProfileAdminAccess} />
         <Route exact path="/newUsersDisplay" component={NewUsersDisplay} />
         <Route exact path="/adminEvents/" component={AdminEvents} />
         <Route exact path="/events/" component={Events} />
+        <Route exact path="/eventDetails/:id" component={EventDetails} />
+        <Route exact path="/userEventDetails/:id" component={UserEventDetails} />
         <Route exact path="/createEvent" component={CreateEvent} />
         <Route exact path="/eventConfirmation/" component={EventConfirmation} />
 
