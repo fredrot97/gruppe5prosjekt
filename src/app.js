@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
+//import nodemailer from "nodemailer";
 import { Link, HashRouter, Switch, Route } from "react-router-dom";
 import createHashHistory from "history/createHashHistory";
 const history = createHashHistory();
 import { userService } from "./services.js";
+//  var nodeMailer=require("nodemailer");
 
   class LoginScreen extends React.Component {
   constructor() {
@@ -32,10 +34,15 @@ import { userService } from "./services.js";
     );
   }
   componentDidMount() {
+    userService.userLogOut();
     this.refs.userLoginButton.onclick = () => {
       userService.signIn(this.refs.inputEmail.value, this.refs.inputPassword.value, (user) => {
         if (user.firstName == "No Result") {
           document.getElementById("loginError").textContent = "Email or password is incorrect.";
+        } else if (user.status == "Deactivated") {
+          document.getElementById("loginError").textContent = "Brukeren er deaktivert. Ta kontakt med admin.";
+        } else if (user.status == "pending") {
+          document.getElementById("loginError").textContent = "Din brukerforesprøsel er ikke behandlet.";
         }
         else {
           userService.checkAdmin(this.refs.inputEmail.value, () => {
@@ -80,6 +87,7 @@ render() {
       <h2>Din profil</h2>
       <button ref="eventsButton">Arrangementer</button>
       <button ref="otherUsersButton">Søk opp medlem</button>
+      <button ref="contactAdminButton">Kontakt admin</button>
     </div>
     <div>
       <button ref="userLogoutButton">Logg ut</button>
@@ -93,6 +101,7 @@ render() {
 
 
     <h2>Kompetanse: </h2>
+    <h2>Status: {this.user.status}</h2>
     <button ref="changeProfileDetailsButton">Endre detaljer</button>
     </div>
     </div>
@@ -106,12 +115,97 @@ render() {
   this.refs.eventsButton.onclick = () => {
     history.replace("/events/");
     }
+    this.refs.contactAdminButton.onclick = () => {
+      history.replace("/contactAdmin/");
+      }
   this.refs.otherUsersButton.onclick = () => {
     history.replace("/otherUsers/");
     }
   this.refs.changeProfileDetailsButton.onclick = () => {
     history.replace("/changeProfile/");
     }
+  }
+}
+
+class ContactAdmin extends React.Component {
+  constructor (props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div>
+      <div>
+      <nav>
+        <ul>
+              <h1>Kontakt admin</h1>
+          <li>
+            <Link to="/arrangements/">Arrangementer</Link>
+          </li>
+          <li>
+            <Link to="/profile/:email/">Tilbake til forsiden</Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+      <div>
+        <h4>Din email:</h4> <br />
+          <input type="email" ref="yourEmail" /> <br />
+        <h4>Emne:</h4> <br />
+          <input type="text" ref="subject" /> <br />
+        <h4>Innhold:</h4> <br />
+          <input type="text" ref="contentEmail" /> <br />
+            <button ref="sendEmail">Send</button>
+            </div>
+          </div>
+    );
+  }
+  componentDidMount() {
+  this.refs.sendEmail.onclick = () => {
+    let transporter = nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'goops5hjelp@gmail.com',
+          pass: 'goops5hjelp123'
+        }
+      });
+      let mailOptions = {
+        from: this.refs.yourEmail.value, // sender address
+        to: 'goops5hjelp@gmail.com', // list of receivers
+        subject: this.refs.subject.value, // Subject line
+        html: this.refs.contentEmail.value + '<br>' + '</br>' + 'Du har mottatt denne meldingen fra ' + this.refs.yourEmail.value // plain text body
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.log(error);
+        }
+      });
+      history.replace("/emailConfirmation/");
+   }
+  }
+}
+
+class EmailConfirmation extends React.Component {
+  constructor() {
+    super(); // Call React.Component constructor
+
+    this.users = [];
+  }
+
+render() {
+  return (
+    <div>
+    <div>
+      <Link to="/profile/:email/">Tilbake til forsiden</Link>
+    </div>
+    <div>
+    <h2>Meldingen din har blitt sendt!</h2>
+    <h4>Du vil motta et svar så fort som mulig.</h4>
+    </div>
+    </div>
+    );
   }
 }
 
@@ -141,6 +235,7 @@ class ChangeProfile extends React.Component{
 
       <h2>Kompetanse:</h2>
       <input type="text" ref="changeCompetence" />
+
       <button ref="changeUserDetailsButton">Endre detaljer</button>
       </div>
       </div>
@@ -192,8 +287,17 @@ class OtherUsers extends React.Component {
 
     var user = userService.getSignedInUser();
     this.user = user;
+    this.users = [];
   }
   render () {
+    let listUsers = [];
+    for(let user of this.users) {
+      listUsers.push(
+        <li key={user.ID}>
+          <Link to={"/profileAccess/" + user.ID + ""}>{user.firstName, user.lastName}</Link>
+        </li>
+      );
+    }
     return(
       <div>
       <div>
@@ -201,8 +305,9 @@ class OtherUsers extends React.Component {
       </div>
       <div>
       <h2>Søk opp bruker:</h2>
-      <input type="text" ref="inputSearch"></input>
+      <input type="text" ref="searchInput"></input>
       <button ref="searchUserButton">Søk</button>
+      <div id="searchResults">{listUsers}</div>
       </div>
       </div>
     )
@@ -213,8 +318,55 @@ class OtherUsers extends React.Component {
     this.refs.backToProfileButton.onclick = () => {
       history.replace("/profile/:" + user.email + "");
     }
+    this.refs.searchUserButton.onclick = () => {
+      userService.getSearchUsers(this.refs.searchInput.value, (result) => {
+        this.users = result;
+        this.forceUpdate();
+      });
+    }
   }
 }
+class ProfileAccess extends React.Component {
+    constructor(props) {
+      super(props);
+
+      this.user = [];
+  }
+
+  render() {
+      return(
+        <div>
+        <div>
+          <button ref="eventButton">Arrangementer</button>
+          <button ref="otherUsersButton">Søk opp medlemer</button>
+        </div>
+        <div>
+        <h2>Fornavn: {this.user.firstName}</h2>
+        <h2>Etternavn: {this.user.lastName}</h2>
+
+        <h2>Addresse: {this.user.address}</h2>
+        <h2>Telefonnummer: {this.user.phonenumber}</h2>
+
+
+        <h2>Kompetanse: </h2>
+        </div>
+        </div>
+      )
+    }
+    componentDidMount() {
+      userService.getSearchUser((this.props.location.pathname.substring(15)), (nUser) => {
+        this.user = nUser;
+        console.log(nUser);
+        this.forceUpdate();
+      });
+      this.refs.eventButton.onclick = () => {
+          history.replace("/events/");
+        }
+      this.refs.otherUsersButton.onclick = () => {
+          history.replace("/otherUsers/");
+        }
+    }
+  }
 
 class UserProfileAdmin extends React.Component {
   constructor(props) {
@@ -432,33 +584,107 @@ class ProfileAdminAccess extends React.Component {
   }
 
 class NewUsersDisplay extends React.Component {
-    constructor(props) {
-      super(props);
+  constructor(props) {
+    super(props);
 
-      var user = userService.getSignedInUser();
-      this.user = user;
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.users = [];
+  }
+  render() {
+    let listUsers = [];
+    for(let user of this.users) {
+      listUsers.push(
+        <li key={user.ID}>
+          <Link to={"/newProfileAdminAccess/" + user.ID + ""}>{user.firstName, user.lastName}</Link>
+        </li>
+      );
     }
+    return(
+      <div>
+      <div>
+      <button ref="backToAdminProfileButton">Din profil</button>
+      </div>
+      <div>
+      <h2>Nye medlemmer:</h2>
+        <ul>{listUsers}</ul>
+      </div>
+      </div>
+    )
+  }
+  componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToAdminProfileButton.onclick = () => {
+      history.replace("/profile/admin/:" + user.email + "");
+    }
+    userService.getNewUsers( (result) => {
+      this.users = result;
+      this.forceUpdate();
+    });
+  }
+  }
+  class NewProfileAdminAccess extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.user = [];
+    }
+
     render() {
-      return(
-        <div>
-        <div>
-        <button ref="backToAdminProfileButton">Din profil</button>
-        </div>
-        <div>
-        <h2>Påmeldte brukere:</h2>
-        <h4>~Liste~</h4>
-        </div>
-        </div>
-      )
-    }
-    componentDidMount() {
-      var user = userService.getSignedInUser();
-      this.user = user;
-      this.refs.backToAdminProfileButton.onclick = () => {
-        history.replace("/profile/admin/:" + user.email + "");
-      }
+        return(
+          <div>
+          <div>
+            <button ref="adminEventButton">Arrangementer</button>
+            <button ref="userDisplayButton">Brukere </button>
+            <button ref="newUserDisplayButton">Nye brukere</button>
+          </div>
+          <div>
+          <h2>Fornavn: {this.user.firstName}</h2>
+          <h2>Etternavn: {this.user.lastName}</h2>
 
-    }
+          <h2>Addresse: {this.user.address}</h2>
+          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+
+
+          <h2>Kompetanse: </h2>
+          <button ref="acceptButton">Godta bruker</button>
+          <button ref="denyButton">Avslå bruker</button>
+          </div>
+          </div>
+        )
+      }
+      componentDidMount() {
+        userService.getUser((this.props.location.pathname.substring(23)), (nUser) => {
+          this.user = nUser;
+          console.log(nUser);
+          this.forceUpdate();
+        });
+        this.refs.adminEventButton.onclick = () => {
+            history.replace("/adminEvents/");
+          }
+        this.refs.newUserDisplayButton.onclick = () => {
+            history.replace("/newUsersDisplay/");
+          }
+        this.refs.userDisplayButton.onclick = () => {
+            history.replace("/usersDisplay/");
+          }
+          console.log(this);
+          console.log(this.user);
+
+        this.refs.acceptButton.onclick = () => {
+          console.log(this);
+          console.log(this.user);
+          userService.acceptUser((this.user.id), (result) => {
+            history.replace("/newUsersDisplay/");
+          });
+        }
+        this.refs.denyButton.onclick = () => {
+          userService.denyUser((this.user.id), (result) => {
+            history.replace("/newUsersDisplay/");
+          });
+        }
+      }
     }
 
 class AdminEvents extends React.Component {
@@ -1062,14 +1288,6 @@ class CreateUser extends React.Component {
       if(isValidInput == true) {
         history.replace("/userConfirmation/");
         userService.addUser(this.refs.nFirstname.value, this.refs.nLastname.value, this.refs.nAddress.value, this.refs.nEmail1.value, this.refs.nPhonenumber.value, this.refs.nPassword1.value, (result) => {
-
-        this.refs.nFirstname.value = "";
-        this.refs.nLastname.value = "";
-        this.refs.nAddress.value = "";
-        this.refs.nEmail1.value = "";
-        this.refs.nPhonenumber.value = "";
-        this.refs.nPassword1.value = "";
-
       });
     } else {
       document.getElementById("addUserError").textContent = "Please fill out missing spaces.";
@@ -1101,7 +1319,7 @@ render() {
     );
   }
   componentDidMount() {
-    this.refs.backToLoginButtonsButton.onclick = () => {
+    this.refs.backToLoginButton.onclick = () => {
       history.replace("/");
     }
   }
@@ -1148,15 +1366,19 @@ ReactDOM.render((
         <Route exact path="/changeAdminProfile/" component={ChangeAdminProfile} />
         <Route exact path="/changeAdminProfileSuccess/" component={ChangeAdminProfileSuccess} />
         <Route exact path="/otherUsers/" component={OtherUsers} />
+        <Route exact path="/profileAccess/:id" component={ProfileAccess} />
         <Route exact path="/usersDisplay/" component={UsersDisplay} />
         <Route exact path="/profileAdminAccess/:id" component={ProfileAdminAccess} />
         <Route exact path="/newUsersDisplay" component={NewUsersDisplay} />
+        <Route exact path="/newProfileAdminAccess/:id" component={NewProfileAdminAccess} />
         <Route exact path="/adminEvents/" component={AdminEvents} />
         <Route exact path="/events/" component={Events} />
         <Route exact path="/eventDetails/:id" component={EventDetails} />
         <Route exact path="/userEventDetails/:id" component={UserEventDetails} />
         <Route exact path="/createEvent" component={CreateEvent} />
         <Route exact path="/eventConfirmation/" component={EventConfirmation} />
+        <Route exact path="/contactAdmin/" component={ContactAdmin} />
+        <Route exact path="/emailConfirmation/" component={EmailConfirmation} />
 
       </Switch>
     </div>
