@@ -1,24 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import nodemailer from "nodemailer";
-
-
 import { Link, HashRouter, Switch, Route } from "react-router-dom";
 import createHashHistory from "history/createHashHistory";
 const history = createHashHistory();
 import { userService } from "./services.js";
-  var nodeMailer=require("nodemailer");
+var nodeMailer=require("nodemailer");
 
   class LoginScreen extends React.Component {
   constructor() {
     super();
   }
 
-  render()  {
+  render() {
     return (
       <div>
       <h2>Email:</h2>
-        <input type="email" ref="inputEmail" />
+        <input type="text" ref="inputEmail" />
       <h2>Passord:</h2>
         <input type="password" ref="inputPassword" />
         <div id="loginError"></div>
@@ -26,11 +24,11 @@ import { userService } from "./services.js";
 
         <div>
         <h2>Glemt passord:</h2>
-        <Link to="/forgottenPassword/">Hent passord</Link>
+        <button ref="forgotPasswordButton">Hent passord</button>
         </div>
       <div>
         <h2>Opprett bruker:</h2>
-        <Link to="/createUser/">Ny bruker</Link>
+        <button ref="createUserButton">Ny bruker</button>
       </div>
       </div>
     );
@@ -41,16 +39,30 @@ import { userService } from "./services.js";
       userService.signIn(this.refs.inputEmail.value, this.refs.inputPassword.value, (user) => {
         if (user.firstName == "No Result") {
           document.getElementById("loginError").textContent = "Email or password is incorrect.";
-        } else if (user.status == "Deactivated") {
+        } else if (user.status == "deactivated") {
           document.getElementById("loginError").textContent = "Brukeren er deaktivert. Ta kontakt med admin.";
         } else if (user.status == "pending") {
           document.getElementById("loginError").textContent = "Din brukerforesprøsel er ikke behandlet.";
         }
         else {
-          history.replace("/profile/:" + user.email + "");
+          userService.checkAdmin(this.refs.inputEmail.value, () => {
+            var AdminUser = userService.getSignedInUser();
+            console.log(user);
+            if(AdminUser.isAdmin) {
+              history.replace("profile/admin/:" + user.email + "");
+            } else {
+            history.replace("/profile/:" + user.email + "");
+            }
+          });
         }
-      })
+      });
     };
+    this.refs.forgotPasswordButton.onclick = () => {
+      history.replace("/forgottenPassword/");
+    }
+    this.refs.createUserButton.onclick = () => {
+      history.replace("/createUser/");
+    }
   }
   //Framtidige funksjoner:
   //*userLoginButton vil ta deg til UserProfile dersom du har skrevet inn riktig email og Passord
@@ -59,7 +71,7 @@ import { userService } from "./services.js";
 
 class UserProfile extends React.Component {
 constructor(props) {
-  super(props); // Call React.Component constructor
+  super(props);
 
   var user = userService.getSignedInUser();
   this.user = user;
@@ -69,21 +81,16 @@ render() {
   var user = userService.getSignedInUser();
   this.user = user;
   console.log(user);
-  console.log("HEY IM RENDERING HERE");
   return (
     <div>
     <div>
-      <button ref="userLogoutButton">Logg ut</button>
       <h2>Din profil</h2>
       <button ref="eventsButton">Arrangementer</button>
       <button ref="otherUsersButton">Søk opp medlem</button>
       <button ref="contactAdminButton">Kontakt admin</button>
     </div>
     <div>
-      <Link to="/arrangements/">Arrangementer</Link>
-    </div>
-    <div>
-      <Link to="/ContactAdmin/">Kontakt admin</Link>
+      <button ref="userLogoutButton">Logg ut</button>
     </div>
     <div>
     <h2>Fornavn: {this.user.firstName}</h2>
@@ -132,10 +139,10 @@ class ContactAdmin extends React.Component {
         <ul>
               <h1>Kontakt admin</h1>
           <li>
-            <Link to="/arrangements/">Arrangementer</Link>
+            <button ref="eventButton">Arrangementer</button>
           </li>
           <li>
-            <Link to="/profile/:email/">Tilbake til forsiden</Link>
+            <button ref="backToProfileButton">Tilbake til forsiden</button>
           </li>
         </ul>
       </nav>
@@ -153,6 +160,14 @@ class ContactAdmin extends React.Component {
     );
   }
   componentDidMount() {
+  this.refs.eventButton.onclick = () => {
+      history.replace("/events/");
+    }
+    var user = userService.getSignedInUser();
+    this.user = user;
+  this.refs.backToProfileButton.onclick = () => {
+      history.replace("/profile/:" + user.email + "");
+    }
   this.refs.sendEmail.onclick = () => {
     let transporter = nodeMailer.createTransport({
         host: 'smtp.gmail.com',
@@ -191,7 +206,7 @@ render() {
   return (
     <div>
     <div>
-      <Link to="/profile/:email/">Tilbake til forsiden</Link>
+      <button ref="backToProfileButton">Tilbake til profil</button>
     </div>
     <div>
     <h2>Meldingen din har blitt sendt!</h2>
@@ -200,28 +215,26 @@ render() {
     </div>
     );
   }
+componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+  this.refs.backToProfileButton.onclick = () => {
+      history.replace("/profile/:" + user.email + "");
+    }
+}
 }
 
 class ChangeProfile extends React.Component{
   constructor(props) {
     super(props);
+
+    var user = userService.getSignedInUser();
+    this.user = user;
   }
   render() {
     return (
       <div>
       <div>
-      <nav>
-        <ul>
-              <h1>Kontakt admin</h1>
-          <li>
-            <Link to="/arrangements/">Arrangementer</Link>
-          </li>
-          <li>
-            <Link to="/profile/:email/">Tilbake til forsiden</Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
       <button ref="backToProfileButton">Din profil</button>
       </div>
       <div>
@@ -268,43 +281,25 @@ class ChangeProfileSuccess extends React.Component {
     return (
       <div>
       <div>
-        <h4>Din email:</h4> <br />
-          <input type="email" placeholder="Ola@Nordmann.no" ref="yourEmail" /> <br />
-        <h4>Emne:</h4> <br />
-          <input type="text" placeholder="" ref="subject" /> <br />
-        <h4>Innhold:</h4> <br />
-          <input type="text" placeholder="" ref="contentEmail" /> <br />
-            <button ref="sendEmail">Send</button>
-            </div>
-          </div>
-    );
+      <h2>Dine endringer er oppdatert!</h2>
+      <h4>Tilbake til din profil:</h4>
+      <button ref="backToProfileButton">Din profil</button>
+      </div>
+      </div>
+    )
   }
-
   componentDidMount() {
-  this.refs.sendEmail.onclick = () => {
-    let transporter = nodeMailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: 'goops5hjelp@gmail.com',
-          pass: 'goops5hjelp123'
-        }
-      });
-      let mailOptions = {
-        from: this.refs.yourEmail.value, // sender address
-        to: 'goops5hjelp@gmail.com', // list of receivers
-        subject: this.refs.subject.value, // Subject line
-        html: this.refs.contentEmail.value + '<br>' + '</br>' + 'Du har mottatt denne meldingen fra ' + this.refs.yourEmail.value // plain text body
-      };
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToProfileButton.onclick = () => {
+      history.replace("/profile/:" + user.email + "");
+    }
+  }
+}
+class OtherUsers extends React.Component {
+  constructor(props) {
+    super(props);
 
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return console.log(error);
-        }
-      });
-      history.replace("/EmailConfirmation/");
-   }
     var user = userService.getSignedInUser();
     this.user = user;
     this.users = [];
@@ -388,31 +383,61 @@ class ProfileAccess extends React.Component {
     }
   }
 
-class EmailConfirmation extends React.Component {
-  constructor() {
-    super(); // Call React.Component constructor
+class UserProfileAdmin extends React.Component {
+  constructor(props) {
+    super(props);
 
-    this.users = [];
-  }
-
-render() {
-  return (
-    <div>
-    <div>
-      <Link to="/profile/:email/">Tilbake til forsiden</Link>
-    </div>
-    <div>
-    <h2>Meldingen din har blitt sendt!</h2>
-    <h4>Du vil motta et svar så fort som mulig.</h4>
-    </div>
-    </div>
-    );
-  }
+    var user = userService.getSignedInUser();
+    this.user = user;
 }
 
-class ChangeProfile extends React.Component{
+render() {
+    return(
+      <div>
+      <div>
+        <button ref="adminLogoutButton">Logg ut</button>
+        <button ref="adminEventButton">Arrangementer</button>
+        <button ref="userDisplayButton">Brukere </button>
+        <button ref="newUserDisplayButton">Nye brukere</button>
+      </div>
+      <div>
+      <h2>Fornavn: {this.user.firstName}</h2>
+      <h2>Etternavn: {this.user.lastName}</h2>
+
+      <h2>Addresse: {this.user.address}</h2>
+      <h2>Telefonnummer: {this.user.phonenumber}</h2>
+
+
+      <h2>Kompetanse: </h2>
+      <button ref="changeAdminDetailsButton">Endre detaljer</button>
+      </div>
+      </div>
+    )
+  }
+  componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.adminLogoutButton.onclick = () => {
+      userService.userLogOut();
+        history.replace("/");
+      }
+    this.refs.adminEventButton.onclick = () => {
+        history.replace("/adminEvents/");
+      }
+    this.refs.newUserDisplayButton.onclick = () => {
+        history.replace("/newUsersDisplay/");
+      }
+    this.refs.userDisplayButton.onclick = () => {
+        history.replace("/usersDisplay/");
+      }
+    this.refs.changeAdminDetailsButton.onclick = () => {
+        history.replace("/changeAdminProfile/");
+    }
+  }
+}
+class ChangeAdminProfile extends React.Component{
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -420,19 +445,9 @@ class ChangeProfile extends React.Component{
   render() {
     return (
       <div>
-      <nav>
-        <ul>
-          <li>
-            <h2>Profil</h2>
-          </li>
-          <li>
-            <Link to="/arrangements/">Arrangementer</Link>
-          </li>
-          <li>
-            <Link to="/otherUsers/">Søk opp medlem</Link>
-          </li>
-        </ul>
-      </nav>
+      <div>
+      <button ref="backToAdminProfileButton">Din profil</button>
+      </div>
       <div>
       <h2>Fornavn: {this.user.firstName}</h2>
       <input type="text" ref="changeFirstName" />
@@ -446,7 +461,7 @@ class ChangeProfile extends React.Component{
 
       <h2>Kompetanse:</h2>
       <input type="text" ref="changeCompetence" />
-      <button ref="changeUserDetailsButton">Endre detaljer</button>
+      <button ref="changeAdminDetailsButton">Endre detaljer</button>
       </div>
       </div>
       );
@@ -454,17 +469,20 @@ class ChangeProfile extends React.Component{
     componentDidMount() {
       var user = userService.getSignedInUser();
       this.user = user;
-   this.refs.changeUserDetailsButton.onclick = () => {
+   this.refs.changeAdminDetailsButton.onclick = () => {
      userService.changeUserProfile(this.refs.changeFirstName.value, this.refs.changeLastName.value, this.refs.changeAddress.value, this.refs.changePhonenumber.value, this.user.email, this.user.password, (user) => {
-       history.replace("/changeProfileSuccess/");
+       history.replace("/changeAdminProfileSuccess/");
      });
+     }
+     this.refs.backToAdminProfileButton.onclick = () => {
+       history.replace("/profile/admin/:" + user.email + "");
      }
     }
 }
-//Start på brukerens profil
-class ChangeProfileSuccess extends React.Component {
+
+class ChangeAdminProfileSuccess extends React.Component {
   constructor(props) {
-    super(props); // Call React.Component constructor
+    super(props);
 
     var user = userService.getSignedInUser();
     this.user = user;
@@ -704,12 +722,9 @@ class AdminEvents extends React.Component {
     return(
       <div>
       <div>
+      <h2>Arrangementer:</h2>
       <button ref="backToAdminProfileButton">Din profil</button>
       <button ref="createEventButton">Opprett arrangement</button>
-      </div>
-      <div>
-      <h2>Arrangementer:</h2>
-      <h4>~Liste~</h4>
       </div>
       <div>
         <ul>{listEvents}</ul>
@@ -839,11 +854,8 @@ class Events extends React.Component {
     return(
       <div>
       <div>
-      <button ref="backToProfileButton">Din profil</button>
-      </div>
-      <div>
       <h2>Arrangementer:</h2>
-      <h4>~Liste~</h4>
+      <button ref="backToProfileButton">Din profil</button>
       </div>
       <div>
         <ul>{listEvents}</ul>
@@ -891,30 +903,61 @@ class UserEventDetails extends React.Component {
       <div>
       <div>
       <button ref="backToProfileButton">Din profil</button>
+      <button ref="backToEventsButton">Arrangementer</button>
+      </div>
+      <div>
+      <h2>{this.event.arrangement_Name}</h2>
+      <h3>Beskrivelse:</h3>
+      <h4>{this.event.description}</h4>
+      <h3>Møtested:</h3>
+      <h4>{this.event.meetingpoint}</h4>
+      <h3>Kontaktperson:</h3>
+      <h4>{this.event.contact_name}</h4>
+      <h4>{this.event.contact_phonenumber}</h4>
+      <h3>Dato:</h3>
+      <h4>*mangler*</h4>
+      <h3>Tid:</h3>
+      <h4>{this.event.start_time}</h4>
+      <h4>{this.event.end_time}</h4>
+      <h3>Utstyrsliste:</h3>
+      <h4>{this.event.equipmentlist}</h4>
+      <h3>Kartlenke:</h3>
+      <h4>{this.event.map_link}</h4>
       </div>
       </div>
     )
   }
+
   componentDidMount() {
     var user = userService.getSignedInUser();
     this.user = user;
+    this.refs.backToEventsButton.onclick = () => {
+      history.replace("/events/");
+    }
     this.refs.backToProfileButton.onclick = () => {
       history.replace("/profile/:" + user.email + "");
     }
+    userService.getEvent((this.props.location.pathname.substring(18)), (arrangement) => {
+      this.event = arrangement;
+      console.log(arrangement);
+      this.forceUpdate();
+    });
   }
-}
+  }
 
-class Arrangements extends React.Component {
+class CreateEvent extends React.Component {
   constructor(props) {
     super(props);
 
+    var user = userService.getSignedInUser();
+    this.user = user;
   }
 
   render() {
     return(
       <div>
       <div>
-        <Link to="/profile/:email/">Tilbake til forsiden</Link>
+        <button ref="backToAdminEventsButton">Arrangementer</button>
       </div>
       <div>
         <h1>Opprett arrangement</h1>
@@ -958,6 +1001,11 @@ class Arrangements extends React.Component {
 );
   }
   componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToAdminEventsButton.onclick = () => {
+      history.replace("/adminEvents/");
+    }
     this.refs.addEventButton.onclick = () => {
       let isValidInput = true;
       if(!isNaN(this.refs.nEventname.value) || this.refs.nEventname.value == "") {
@@ -1040,7 +1088,7 @@ class Arrangements extends React.Component {
 
 
       if(isValidInput == true) {
-        history.replace("/EventConfirmation/");
+        history.replace("/eventConfirmation/");
         userService.addEvent(this.refs.nEventname.value, this.refs.nDescription.value,
                              this.refs.nMeetingpoint.value, this.refs.nContactperson.value,
                              this.refs.nPhonenumberContactperson.value, this.refs.nDate.value,
@@ -1052,8 +1100,7 @@ class Arrangements extends React.Component {
     } else {
       document.getElementById("addEventError").textContent = "Please fill out missing spaces.";
     }
-    //Om ingen av feltene er feil vil brukeren bli opprette, men dersom det er feil vil brukeren måtte rette opp i disse
-    //Framtidige funksjoner: Brukeren blir tatt til sin profil/epost bekreftelse ved vellykket brukerdannelse
+    //Om ingen av feltene er feil vil brukeren bli opprettet, men dersom det er feil vil brukeren måtte rette opp i disse
 
   };
 }
@@ -1061,7 +1108,7 @@ class Arrangements extends React.Component {
 
 class EventConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -1070,7 +1117,7 @@ render() {
   return (
     <div>
     <div>
-      <Link to="/profile/:email/">Tilbake til profilen din</Link>
+      <button ref="backToAdminEventsButton">Tilbake til arrangementer</button>
     </div>
     <div>
     <h2>Arrangementet ditt har blitt lagt inn!</h2>
@@ -1079,49 +1126,17 @@ render() {
     </div>
     );
   }
-}
-
-
-class UserProfileAdmin extends React.Component {
-constructor(props) {
-  super(props); // Call React.Component constructor
-
-  this.user = {};
-
-  this.email = props.match.params.email;
-}
-
-render() {
-    let listNewUsers = [];
-    for(let newUser of this.newUsers) {
-      listNewUsers.push(
-        <li key={newUser.email}>
-          <Link to={"/NewUser/" + newUser.email}>{newUser.firstName}</Link>
-        </li>
-      );
-    }
-    let listUsers = [];
-    for(let user of this.users) {
-      listUsers.push(
-        <li key={newUser.email}>
-          <Link to={"/UserProfile/" + user.email}>{user.firstName, user.lastName}</Link>
-          <button onClick={() => {
-            console.log("button for user " + user.email + " clicked");
-            service.deactivateUser(user.email);
-            service.getUsers((result) => {
-              this.users = result;
-              this.forceUpdate(); // Rerender component with updated data
-            });
-          }}>x</button>
-        </li>
-      );
+  componentDidMount() {
+    this.refs.backToAdminEventsButton.onclick = () => {
+      history.replace("/AdminEvents/");
     }
   }
+
 }
 
 class ForgottenPassword extends React.Component {
 constructor() {
-  super(); // Call React.Component constructor
+  super();
 
   this.users = [];
 }
@@ -1130,7 +1145,7 @@ render() {
   return (
     <div>
       <div>
-        <Link to="/">Tilbake til login</Link>
+        <button ref="backToLoginButton">Tilbake til login</button>
       </div>
       <div>
         <h2>Skriv inn email:</h2>
@@ -1146,6 +1161,9 @@ componentDidMount() {
     service.newPassword(this.refs.passwordEmail.value, (user) => {
       history.replace("/passwordConfirmation/");
     });
+    this.refs.backToLoginButton.onclick = () => {
+        history.replace("/");
+      }
   }
 }
 }
@@ -1163,7 +1181,7 @@ class CreateUser extends React.Component {
     return (
       <div>
         <div>
-          <Link to="/">Tilbake til login</Link>
+          <button ref="backToLoginButton">Tilbake til login</button>
         </div>
         <div>
           <h1>Opprett-bruker-side</h1>
@@ -1187,7 +1205,7 @@ class CreateUser extends React.Component {
         <div id="emailError2"></div>
 
         <h2>Mobilnummer:</h2>
-          <input type="number" ref="nPhonenumber" />
+          <input type="text" ref="nPhonenumber" />
         <div id="phonenumberError"></div>
 
         <h2>Passord:</h2>
@@ -1206,11 +1224,14 @@ class CreateUser extends React.Component {
   }
 
   componentDidMount() {
+    this.refs.backToLoginButton.onclick = () => {
+      history.replace("/");
+    }
     this.refs.addUserButton.onclick = () => {
       let isValidInput = true;
       if(!isNaN(this.refs.nFirstname.value) || this.refs.nFirstname.value == "") {
         isValidInput = false;
-        document.getElementById("fnameError").textContent = "This is not a valid name.";
+        document.getElementById("fnameError").textContent = "Ikke gyldig navn.";
       } else {
         document.getElementById("fnameError").textContent = "";
       }
@@ -1218,7 +1239,7 @@ class CreateUser extends React.Component {
       //Fiks funksjonen slik at man ikke kan skrive inn tall med bokstaver
       if(!isNaN(this.refs.nLastname.value) || this.refs.nLastname.value == "") {
         isValidInput = false;
-        document.getElementById("lnameError").textContent = "This is not a valid name.";
+        document.getElementById("lnameError").textContent = "Ikke gyldig navn.";
       } else {
         document.getElementById("lnameError").textContent = "";
       }
@@ -1226,27 +1247,27 @@ class CreateUser extends React.Component {
       //Fiks funksjonen slik at man ikke kan skrive inn tall med bokstaver
       if(this.refs.nAddress.value == "") {
         isValidInput = false;
-        document.getElementById("addressError").textContent = "This is not a valid address."
+        document.getElementById("addressError").textContent = "Ikke gyldig addresse."
       } else {
         document.getElementById("addressError").textContent = "";
       }
 
       if(this.refs.nEmail1.value != this.refs.nEmail2.value) {
         isValidInput = false;
-        document.getElementById("emailError2").textContent = "Emails do not match.";
+        document.getElementById("emailError2").textContent = "Epostene samsvarer ikke.";
       } else if (this.refs.nEmail1.value == "") {
         isValidInput = false;
-        document.getElementById("emailError1").textContent = "This is not a valid email.";
+        document.getElementById("emailError1").textContent = "Ikke gyldig epost.";
       } else if (this.refs.nEmail2.value == "") {
         isValidInput = false;
-        document.getElementById("emailError2").textContent = "This is not a valid email.";
+        document.getElementById("emailError2").textContent = "Ikke gyldig epost.";
       } else {
         document.getElementById("emailError1").textContent = "";
         document.getElementById("emailError2").textContent = "";
       }
       userService.checkEmail(this.refs.nEmail1.value, () => {});
-      if(userService.isEmailTaken) {
-        document.getElementById("emailError1").textContent = "Email is already taken asshat";
+      if(userService.isEmailTaken(this.refs.nEmail1.value)) {
+        document.getElementById("emailError1").textContent = "Epost er allerede i bruk.";
         isValidInput = false;
       }
       //Sjekker om innskrevne emailer samsvarer, samt om noen av feltene er tomme
@@ -1254,7 +1275,7 @@ class CreateUser extends React.Component {
       //*Framtidige funksjoner: sjekke at emailen inneholder riktige tegn, f.eks. @
       if(isNaN(this.refs.nPhonenumber.value) || this.refs.nPhonenumber.value == "") {
         isValidInput = false;
-        document.getElementById("phonenumberError").textContent = "This is not a valid phonenumber.";
+        document.getElementById("phonenumberError").textContent = "Ikke gyldig telefonnummer.";
       } else {
         document.getElementById("phonenumberError").textContent = "";
       }
@@ -1262,19 +1283,20 @@ class CreateUser extends React.Component {
       //*Framtidige funksjoner: Sjekke at nummeret er 8 siffer langt
       if(this.refs.nPassword1.value != this.refs.nPassword2.value) {
         isValidInput = false;
-        document.getElementById("passwordError2").textContent = "Passwords do not match.";
+        document.getElementById("passwordError2").textContent = "Passord samsvarer ikke.";
       } else if (this.refs.nPassword1.value == "") {
         isValidInput = false;
-        document.getElementById("passwordError1").textContent = "This is not a valid password.";
+        document.getElementById("passwordError1").textContent = "Ikke gyldig passord.";
       } else if (this.refs.nPassword2.value == "") {
         isValidInput = false;
-        document.getElementById("passwordError2").textContent = "This is not a valid password.";
+        document.getElementById("passwordError2").textContent = "Ikke gyldig passord.";
       } else {
         document.getElementById("passwordError1").textContent = "";
         document.getElementById("passwordError2").textContent = "";
       }
       //Sjekker om innskrevne passord samsvarer, samt om noen av feltene er tomme
       //Famtidige funskjoner: implementer safe password (at det må være så pass langt og slikt)
+
       if(isValidInput == true) {
         history.replace("/userConfirmation/");
         userService.addUser(this.refs.nFirstname.value, this.refs.nLastname.value, this.refs.nAddress.value, this.refs.nEmail1.value, this.refs.nPhonenumber.value, this.refs.nPassword1.value, (result) => {
@@ -1284,12 +1306,13 @@ class CreateUser extends React.Component {
     }
     //Om ingen av feltene er feil vil brukeren bli opprette, men dersom det er feil vil brukeren måtte rette opp i disse
     //Framtidige funksjoner: Brukeren blir tatt til sin profil/epost bekreftelse ved vellykket brukerdannelse
+    localStorage.setItem("exists","");
     };
   }
 }
 class UserConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -1298,11 +1321,11 @@ render() {
   return (
     <div>
     <div>
-      <Link to="/">Tilbake til login</Link>
+      <button ref="backToLoginButton">Tilbake til login</button>
     </div>
     <div>
     <h2>Takk for at du har meldt deg inn!</h2>
-    <h4>Du vil motta en email når søknadden din har blitt behandlet.</h4>
+    <h4>Du vil motta en email når søknaden din har blitt behandlet.</h4>
     </div>
     </div>
     );
@@ -1316,7 +1339,7 @@ render() {
 
 class PasswordConfirmation extends React.Component {
   constructor() {
-    super(); // Call React.Component constructor
+    super();
 
     this.users = [];
   }
@@ -1325,7 +1348,7 @@ render() {
   return (
     <div>
     <div>
-      <Link to="/">Tilbake til login</Link>
+      <button ref="backToLoginButton">Tilbake til login</button>
     </div>
     <div>
     <h2>Passord tilbakestilt!</h2>
@@ -1334,7 +1357,10 @@ render() {
     </div>
     );
   }
-}
+  //this.refs.backToLoginButton.onclick = () => {
+    //history.replace("/");
+  }
+
 
 ReactDOM.render((
   <HashRouter>
@@ -1345,15 +1371,10 @@ ReactDOM.render((
         //<Route exact path="/passwordConfirmation/" component={PasswordConfirmation} />
         <Route exact path="/createUser/" component={CreateUser} />
         <Route exact path="/userConfirmation/" component={UserConfirmation} />
-        <Route exact path="/profile/:email/" component={UserProfile} />
-        <Route exact path="/profile/admin/:admin" component={UserProfileAdmin} />
-        <Route exact path="/arrangements/" component={Arrangements} />
-        <Route exact path="/EventConfirmation/" component={EventConfirmation} />
+        <Route exact path="/profile/:email" component={UserProfile} />
+        <Route exact path="/profile/admin/:email" component={UserProfileAdmin} />
         <Route exact path="/changeProfile/" component={ChangeProfile} />
         <Route exact path="/changeProfileSuccess/" component={ChangeProfileSuccess} />
-        <Route exact path="/arrangements/" component={Arrangements} />
-        <Route exact path="/ContactAdmin/" component={ContactAdmin} />
-        <Route exact path="/EmailConfirmation/" component={EmailConfirmation} />
         <Route exact path="/changeAdminProfile/" component={ChangeAdminProfile} />
         <Route exact path="/changeAdminProfileSuccess/" component={ChangeAdminProfileSuccess} />
         <Route exact path="/otherUsers/" component={OtherUsers} />
