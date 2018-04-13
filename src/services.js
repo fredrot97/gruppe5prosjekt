@@ -38,6 +38,8 @@ class User {
     this.phonenumber = phonenumber;
     this.password = password;
     this.points = points;
+  }
+}
     this.status = status;
     this.isAdmin = false;
   }
@@ -57,10 +59,9 @@ class Event {
     this.map_link = Map_Link;
   }
 }
-
 class UserService {
   addEvent(nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nMap, nEquipmentlist, callback) {
-    connection.query("INSERT INTO Events (Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nEquipmentlist, nMap], (error, result) => {
+    connection.query("INSERT INTO Arrangement (Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nEquipmentlist, nMap], (error, result) => {
       if (error) throw error;
 
       callback();
@@ -147,19 +148,10 @@ class UserService {
         if(result.length == 1) {
           user = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
           localStorage.setItem("user", JSON.stringify(user));
+          console.log("successfully stored user");
         }
         callback(user);
     });
-  }
-  checkAdmin(inputEmail, callback) {
-      connection.query("SELECT * FROM Adminlist WHERE email=?", [inputEmail], (error, result) => {
-        if(result.length == 1){
-          let AdminUser = JSON.parse(localStorage.getItem("user"));
-          AdminUser.isAdmin = true;
-          localStorage.setItem("user", JSON.stringify(AdminUser));
-        }
-        callback();
-      });
   }
   getSignedInUser() {
     return JSON.parse(localStorage.getItem("user"));
@@ -171,7 +163,7 @@ class UserService {
       if(result.length == 1) {
         localStorage.setItem("exists", "true");
       }
-      else {
+      else{
         localStorage.setItem("exists", "false");
       }
       callback();
@@ -179,40 +171,33 @@ class UserService {
   }
 
   isEmailTaken() {
-    return localStorage.getItem("exists") == "true";
+    return localStorage.getItem("exists") == true;
   }
 
   userLogOut() {
     localStorage.setItem("user","");
+    console.log("successfully removed user");
   }
   changeUserProfile(changeFirstName, changeLastName, changeAddress, changePhonenumber, email, password, callback) {
     if(changeFirstName != "") {
       connection.query("UPDATE Users SET firstName=? WHERE email=?", [changeFirstName, email], (error, result) => {
         if (error) throw error;
-        let NewFirstName = localStorage.getItem("user");
-        NewFirstName.firstName = changeFirstName;
-        localStorage.setItem("user", NewFirstName);
+
       });
     } if(changeLastName != "") {
       connection.query("UPDATE Users SET lastName=? WHERE email=?", [changeLastName, email], (error, result) => {
         if (error) throw error;
-        let NewLastName = localStorage.getItem("user");
-        NewLastName.lastName = changeLastName;
-        localStorage.setItem("user", NewLastName);
+
       });
     } if(changeAddress != "") {
       connection.query("UPDATE Users SET address=? WHERE email=?", [changeAddress, email], (error, result) => {
         if (error) throw error;
-        let NewAddress = JSON.parse(localStorage.getItem("user"));
-        NewAddress.address = changeAddress;
-        localStorage.setItem("user", JSON.stringify(NewAddress));
+
       });
-    } if(changePhonenumber != "" && !isNaN(changePhonenumber)) {
+    } if(changePhonenumber != "" || !isNaN(changePhonenumber)) {
       connection.query("UPDATE Users SET phonenumber=? WHERE email=?", [changePhonenumber, email], (error, result) => {
         if (error) throw error;
-        let NewPhonenumber = JSON.parse(localStorage.getItem("user"));
-        NewPhonenumber.phonenumber = changePhonenumber;
-        localStorage.setItem("user", JSON.stringify(NewPhonenumber));
+
       });
     }
     this.signIn(email,password, (user) => {
