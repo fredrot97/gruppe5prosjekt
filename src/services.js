@@ -29,7 +29,8 @@ connect();
 
 // Class that performs database queries related to customers
 class User {
-  constructor(firstName,lastName,address,email,phonenumber,password,points) {
+  constructor(id, firstName,lastName,address,email,phonenumber,password,points,status) {
+    this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.address = address;
@@ -37,6 +38,25 @@ class User {
     this.phonenumber = phonenumber;
     this.password = password;
     this.points = points;
+  }
+}
+    this.status = status;
+    this.isAdmin = false;
+  }
+}
+
+class Event {
+  constructor(Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link){
+    this.arrangement_Name = Arrangement_Name;
+    this.description = Description;
+    this.meetingpoint = Meetingpoint;
+    this.contact_name = Contact_Name;
+    this.contact_phonenumber = Contact_Phonenumber;
+    this.meetingdate = Meetingdate;
+    this.start_time = Start_time;
+    this.end_time = End_time;
+    this.equipmentlist = Equipmentlist;
+    this.map_link = Map_Link;
   }
 }
 class UserService {
@@ -47,11 +67,86 @@ class UserService {
       callback();
     });
   }
+  getEvent(id, callback) {
+    connection.query("SELECT * FROM Events WHERE ID=?", [id], (error, result) => {
+      let arrangement = new Event("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
+      if (error) throw error;
+      if(result.length == 1) {
+      arrangement = new Event(result[0].Arrangement_Name, result[0].Description, result[0].Meetingpoint, result[0].Contact_Name, result[0].Contact_Phonenumber, result[0].Meetingdate, result[0].Start_time, result[0].End_time, result[0].Equipmentlist, result[0].Map_Link);
+    }
+      callback(arrangement);
+    });
+  }
+  getUsers(callback) {
+    connection.query("SELECT * FROM Users", (error, result) => {
+      if (error) throw error;
+
+      callback(result);
+    });
+  }
+  getUser(id, callback) {
+    connection.query("SELECT * FROM Users WHERE ID=?", [id], (error, result) => {
+      let nUser = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
+      if (error) throw error;
+      if(result.length == 1) {
+      nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0);
+    }
+      callback(nUser);
+    });
+  }
+  getNewUsers(callback) {
+    connection.query("SELECT * FROM Users WHERE status=?", ["pending"], (error, result) => {
+      if (error) throw error;
+
+      callback(result);
+    });
+  }
+  acceptUser(id, callback) {
+    connection.query("UPDATE Users SET status=? WHERE id=?", ["active", id], (error, result) => {
+      console.log(id);
+      if (error) throw error;
+
+      callback();
+    });
+  }
+  denyUser(id, callback) {
+    connection.query("DELETE FROM Users WHERE id=?", [id], (error, result) => {
+        console.log(id);
+      if (error) throw error;
+
+      callback();
+    });
+  }
+  getSearchUsers(searchInput, callback) {
+    connection.query("SELECT * FROM Users WHERE firstName=? OR lastName=? OR phonenumber=? OR email=?", [searchInput, searchInput, searchInput, searchInput], (error, result) => {
+      console.log("GETTING RESULTS");
+      if (error) throw error;
+
+      callback(result);
+    });
+  }
+  getSearchUser(id, callback) {
+    connection.query("SELECT * FROM Users WHERE ID=?", [id], (error, result) => {
+      let nUser = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
+      if (error) throw error;
+      if(result.length == 1) {
+      nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
+    }
+      callback(nUser);
+    });
+  }
+  getEvents(callback) {
+    connection.query('SELECT * FROM Events', (error, result) => {
+      if (error) throw error;
+
+      callback(result);
+    });
+  }
   signIn(inputEmail, inputPassword, callback) {
       connection.query("SELECT * FROM Users WHERE email=? AND password=?", [inputEmail,inputPassword], (error, result) => {
         let user = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
         if(result.length == 1) {
-          user = new User(result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0);
+          user = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
           localStorage.setItem("user", JSON.stringify(user));
           console.log("successfully stored user");
         }
@@ -113,7 +208,7 @@ class UserService {
   }
 
   addUser(nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1, callback) {
-    connection.query("INSERT INTO Users (firstName, lastName, address, email, phonenumber, password) values (?, ?, ?, ?, ?, ?)", [nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1], (error, result) => {
+    connection.query("INSERT INTO Users (firstName, lastName, address, email, phonenumber, password, status) values (?, ?, ?, ?, ?, ?, ?)", [nFirstname, nLastname, nAddress, nEmail1, nPhonenumber, nPassword1, "pending"], (error, result) => {
       if (error) throw error;
 
       callback();
