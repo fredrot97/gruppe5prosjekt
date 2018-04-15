@@ -44,7 +44,8 @@ class User {
 }
 
 class Event {
-  constructor(Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link){
+  constructor(id, Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link){
+    this.id = id;
     this.arrangement_Name = Arrangement_Name;
     this.description = Description;
     this.meetingpoint = Meetingpoint;
@@ -71,9 +72,16 @@ class UserService {
       let arrangement = new Event("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
       if (error) throw error;
       if(result.length == 1) {
-      arrangement = new Event(result[0].Arrangement_Name, result[0].Description, result[0].Meetingpoint, result[0].Contact_Name, result[0].Contact_Phonenumber, result[0].Meetingdate, result[0].Start_time, result[0].End_time, result[0].Equipmentlist, result[0].Map_Link);
+      arrangement = new Event(result[0].ID, result[0].Arrangement_Name, result[0].Description, result[0].Meetingpoint, result[0].Contact_Name, result[0].Contact_Phonenumber, result[0].Meetingdate, result[0].Start_time, result[0].End_time, result[0].Equipmentlist, result[0].Map_Link);
     }
       callback(arrangement);
+    });
+  }
+  deleteEvent(id, callback) {
+    connection.query("DELETE FROM Events WHERE ID=?", [id], (error, result) => {
+      if (error) throw error;
+
+      callback();
     });
   }
   getUsers(callback) {
@@ -100,6 +108,13 @@ class UserService {
       callback(result);
     });
   }
+  getDeletedUsers(callback) {
+    connection.query("SELECT * FROM Users WHERE status=?", ["deactivated"], (error, result) => {
+      if (error) throw error;
+
+      callback(result);
+    });
+  }
   acceptUser(id, callback) {
     connection.query("UPDATE Users SET status=? WHERE id=?", ["active", id], (error, result) => {
       console.log(id);
@@ -117,7 +132,7 @@ class UserService {
     });
   }
   getSearchUsers(searchInput, callback) {
-    connection.query("SELECT * FROM Users WHERE firstName=? OR lastName=? OR phonenumber=? OR email=?", [searchInput, searchInput, searchInput, searchInput], (error, result) => {
+    connection.query("SELECT * FROM Users WHERE (firstName=? OR lastName=? OR phonenumber=? OR email=? OR status=?) AND status!=? AND status!=?", [searchInput, searchInput, searchInput, searchInput, searchInput, "pending", "deactivated"], (error, result) => {
       console.log("GETTING RESULTS");
       if (error) throw error;
 
@@ -219,6 +234,65 @@ class UserService {
       console.log("Successfully signed in. User object following");
       console.log(userService.getSignedInUser());
     });
+    callback();
+  }
+
+  changeEvent(id, nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nMap, nEquipmentlist, callback) {
+    console.log("id");
+    if(nEventname != "") {
+      connection.query("UPDATE Events SET arrangement_Name=? WHERE id=?", [nEventname, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nDescription != "") {
+      connection.query("UPDATE Events SET Description=? WHERE id=?", [nDescription, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nMeetingpoint != "") {
+      connection.query("UPDATE Events SET meetingpoint=? WHERE id=?", [nMeetingpoint, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nContactperson != "") {
+      connection.query("UPDATE Events SET contact_name=? WHERE id=?", [nContactperson, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nPhonenumberContactperson != "") {
+      connection.query("UPDATE Events SET contact_phonenumber=? WHERE id=?", [nPhonenumberContactperson, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nDate != "") {
+      connection.query("UPDATE Events SET Meetingdate=? WHERE id=?", [nDate, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    } if(nStartTime != "") {
+      connection.query("UPDATE Events SET start_time=? WHERE id=?", [nStartTime, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    }
+    if(nEndTime != "") {
+      connection.query("UPDATE Events SET end_time=? WHERE id=?", [nEndTime, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    }
+    if(nMap != "") {
+      connection.query("UPDATE Events SET map_link=? WHERE id=?", [nMap, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    }
+    if(nEquipmentlist != "") {
+      connection.query("UPDATE Events SET equipmentlist=? WHERE id=?", [nEquipmentlist, id], (error, result) => {
+        if (error) throw error;
+
+      });
+    }
     callback();
   }
 

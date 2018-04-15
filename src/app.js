@@ -33,6 +33,7 @@ var nodeMailer=require("nodemailer");
       </div>
     );
   }
+
   componentDidMount() {
     userService.userLogOut();
     this.refs.userLoginButton.onclick = () => {
@@ -102,6 +103,8 @@ render() {
 
     <h2>Kompetanse: </h2>
     <h2>Status: {this.user.status}</h2>
+
+    <h2>Vaktpoeng: {this.user.points} </h2>
     <button ref="changeProfileDetailsButton">Endre detaljer</button>
     </div>
     </div>
@@ -399,6 +402,7 @@ render() {
         <button ref="adminEventButton">Arrangementer</button>
         <button ref="userDisplayButton">Brukere </button>
         <button ref="newUserDisplayButton">Nye brukere</button>
+        <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
       </div>
       <div>
       <h2>Fornavn: {this.user.firstName}</h2>
@@ -426,6 +430,9 @@ render() {
       }
     this.refs.newUserDisplayButton.onclick = () => {
         history.replace("/newUsersDisplay/");
+      }
+    this.refs.deletedUserDisplayButton.onclick = () => {
+        history.replace("/deletedUsersDisplay/");
       }
     this.refs.userDisplayButton.onclick = () => {
         history.replace("/usersDisplay/");
@@ -506,6 +513,7 @@ class ChangeAdminProfileSuccess extends React.Component {
     }
   }
 }
+
 class UsersDisplay extends React.Component {
   constructor(props) {
     super(props);
@@ -566,6 +574,7 @@ class ProfileAdminAccess extends React.Component {
           <button ref="adminEventButton">Arrangementer</button>
           <button ref="userDisplayButton">Brukere </button>
           <button ref="newUserDisplayButton">Nye brukere</button>
+          <button ref="deletedUserDisplayButton">Nye brukere</button>
         </div>
         <div>
         <h2>Fornavn: {this.user.firstName}</h2>
@@ -594,6 +603,9 @@ class ProfileAdminAccess extends React.Component {
         }
       this.refs.userDisplayButton.onclick = () => {
           history.replace("/usersDisplay/");
+        }
+      this.refs.deletedUserDisplayButton.onclick = () => {
+          history.replace("/deletedUsersDisplay/");
         }
     }
   }
@@ -639,6 +651,7 @@ class NewUsersDisplay extends React.Component {
     });
   }
   }
+
   class NewProfileAdminAccess extends React.Component {
       constructor(props) {
         super(props);
@@ -653,6 +666,7 @@ class NewUsersDisplay extends React.Component {
             <button ref="adminEventButton">Arrangementer</button>
             <button ref="userDisplayButton">Brukere </button>
             <button ref="newUserDisplayButton">Nye brukere</button>
+            <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
           </div>
           <div>
           <h2>Fornavn: {this.user.firstName}</h2>
@@ -684,6 +698,9 @@ class NewUsersDisplay extends React.Component {
         this.refs.userDisplayButton.onclick = () => {
             history.replace("/usersDisplay/");
           }
+        this.refs.deletedUserDisplayButton.onclick = () => {
+            history.replace("/deletedUsersDisplay/");
+          }
           console.log(this);
           console.log(this.user);
 
@@ -701,6 +718,109 @@ class NewUsersDisplay extends React.Component {
         }
       }
     }
+
+  class DeletedUsersDisplay extends React.Component {
+      constructor(props) {
+        super(props);
+
+        var user = userService.getSignedInUser();
+        this.user = user;
+        this.users = [];
+      }
+      render() {
+        let listUsers = [];
+        for(let user of this.users) {
+          listUsers.push(
+            <li key={user.ID}>
+              <Link to={"/deletedProfileAdminAccess/" + user.ID + ""}>{user.firstName, user.lastName}</Link>
+            </li>
+          );
+        }
+        return(
+          <div>
+          <div>
+          <button ref="backToAdminProfileButton">Din profil</button>
+          </div>
+          <div>
+          <h2>Deaktiverte medlemmer:</h2>
+            <ul>{listUsers}</ul>
+          </div>
+          </div>
+        )
+      }
+      componentDidMount() {
+        var user = userService.getSignedInUser();
+        this.user = user;
+        this.refs.backToAdminProfileButton.onclick = () => {
+          history.replace("/profile/admin/:" + user.email + "");
+        }
+        userService.getDeletedUsers( (result) => {
+          this.users = result;
+          this.forceUpdate();
+        });
+      }
+      }
+
+class DeletedProfileAdminAccess extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.user = [];
+  }
+
+  render() {
+      return(
+        <div>
+        <div>
+          <button ref="adminEventButton">Arrangementer</button>
+          <button ref="userDisplayButton">Brukere </button>
+          <button ref="newUserDisplayButton">Nye brukere</button>
+          <button ref="deletedUserDisplayButton">Nye brukere</button>
+        </div>
+        <div>
+        <h2>Fornavn: {this.user.firstName}</h2>
+        <h2>Etternavn: {this.user.lastName}</h2>
+
+        <h2>Addresse: {this.user.address}</h2>
+        <h2>Telefonnummer: {this.user.phonenumber}</h2>
+
+
+        <h2>Kompetanse: </h2>
+        <button ref="acceptButton">Reaktiver bruker</button>
+        </div>
+        </div>
+          )
+        }
+    componentDidMount() {
+      userService.getUser((this.props.location.pathname.substring(27)), (nUser) => {
+        this.user = nUser;
+          console.log(nUser);
+        this.forceUpdate();
+          });
+        this.refs.adminEventButton.onclick = () => {
+            history.replace("/adminEvents/");
+          }
+        this.refs.newUserDisplayButton.onclick = () => {
+            history.replace("/newUsersDisplay/");
+          }
+        this.refs.deletedUserDisplayButton.onclick = () => {
+              history.replace("/deletedUsersDisplay/");
+            }
+          this.refs.userDisplayButton.onclick = () => {
+              history.replace("/usersDisplay/");
+            }
+            console.log(this);
+            console.log(this.user);
+
+          this.refs.acceptButton.onclick = () => {
+            console.log(this);
+            console.log(this.user);
+            userService.acceptUser((this.user.id), (result) => {
+              history.replace("/deletedUsersDisplay/");
+            });
+          }
+        }
+      }
 
 class AdminEvents extends React.Component {
   constructor(props) {
@@ -725,6 +845,7 @@ class AdminEvents extends React.Component {
       <h2>Arrangementer:</h2>
       <button ref="backToAdminProfileButton">Din profil</button>
       <button ref="createEventButton">Opprett arrangement</button>
+      <h2> Dine vakt poeng: {this.user.points} </h2>
       </div>
       <div>
         <ul>{listEvents}</ul>
@@ -791,6 +912,7 @@ class EventDetails extends React.Component {
       <div>
       <button ref="backToAdminProfileButton">Din profil</button>
       <button ref="backToAdminEventsButton">Arrangementer</button>
+      <h2> Dine vakt poeng: {this.user.points} </h2>
       </div>
       <div>
       <h2>{this.event.arrangement_Name}</h2>
@@ -811,6 +933,10 @@ class EventDetails extends React.Component {
       <h3>Kartlenke:</h3>
       <h4>{this.event.map_link}</h4>
       </div>
+      <div>
+      <button ref="changeEventButton">Endre arrangement</button>
+      <button ref="deleteEventButton">Slett arrangement</button>
+      </div>
       </div>
     )
   }
@@ -818,20 +944,129 @@ class EventDetails extends React.Component {
   componentDidMount() {
     var user = userService.getSignedInUser();
     this.user = user;
-    this.refs.backToAdminEventsButton.onclick = () => {
-      history.replace("/adminEvents/");
-    }
-    this.refs.backToAdminProfileButton.onclick = () => {
-      history.replace("/profile/admin/:" + user.email + "");
-    }
     userService.getEvent((this.props.location.pathname.substring(14)), (arrangement) => {
       this.event = arrangement;
-      console.log(arrangement);
+      this.refs.backToAdminEventsButton.onclick = () => {
+        history.replace("/adminEvents/");
+      }
+      this.refs.backToAdminProfileButton.onclick = () => {
+        history.replace("/profile/admin/:" + user.email + "");
+      }
+      this.refs.changeEventButton.onclick = () => {
+        history.replace("/changeEvent/" + this.event.id);
+      }
+      this.refs.deleteEventButton.onclick = () => {
+        userService.deleteEvent((this.event.id), () => {
+          history.replace("/adminEvents/");
+        });
+      }
       this.forceUpdate();
     });
+
+
   }
+  }
+  class ChangeEvent extends React.Component{
+    constructor(props) {
+      super(props);
+
+      var user = userService.getSignedInUser();
+      this.user = user;
+      this.event = [];
+    }
+    render() {
+      console.log(this.event);
+      return (
+        <div>
+        <div>
+        <button ref="backToEventButton">Arrangementer</button>
+        </div>
+        <div>
+        <h2>Navn på arrangement: {this.event.arrangement_Name}</h2>
+          <input type="text" ref="nEventname" />
+          <div id="EventnameError"></div>
+        <h2>Beskrivelse: {this.event.description}</h2>
+          <input type="text" ref="nDescription" />
+          <div id="DescriptionError"></div>
+        <h2>Møtepunkt: {this.event.meetingpoint}</h2>
+          <input type="text" ref="nMeetingpoint" />
+          <div id="MeetingpointError"></div>
+        <h2>Kontaktperson: {this.event.contact_Name}</h2>
+          <input type="text" ref="nContactperson" />
+          <div id="ContactpersonError"></div>
+        <h2>Telefonnummer kontaktperson: {this.event.contact_phonenumber}</h2>
+          <input type="text" ref="nPhonenumberContactperson" />
+          <div id="PhonenumberContactpersonError"></div>
+        <h2>Dato: Missing</h2>
+          <input type="date" ref="nDate" />
+          <div id="DateError"></div>
+        <h2>Start- og slutt tid: {this.event.start_time}</h2>
+          <input type="time" ref="nStartTime" />
+          <div id="StartTimeError"></div>
+        <h2> {this.event.end_time} </h2>
+          <input type="time" ref="nEndTime" />
+          <div id="EndTimeError"></div>
+        <h2>Link til kart: {this.event.map_Link}</h2>
+          <input type="text" ref="nMap" />
+          <div id="MapError"></div>
+        <h2>Utstyrsliste: {this.event.equipmentlist}</h2>
+          <input type="text" ref="nEquipmentlist" />
+          <div id="EquipmentlistError"></div>
+        <button ref="changeEventButton">Oppdater arrangement</button>
+        </div>
+        </div>
+        );
+      }
+      componentDidMount() {
+        var user = userService.getSignedInUser();
+        this.user = user;
+        userService.getEvent((this.props.location.pathname.substring(13)), (arrangement) => {
+          this.event = arrangement;
+          this.refs.changeEventButton.onclick = () => {
+               userService.changeEvent(this.event.id, this.refs.nEventname.value, this.refs.nDescription.value,
+                                    this.refs.nMeetingpoint.value, this.refs.nContactperson.value,
+                                    this.refs.nPhonenumberContactperson.value, this.refs.nDate.value,
+                                    this.refs.nStartTime.value, this.refs.nEndTime.value,
+                                    this.refs.nMap.value, this.refs.nEquipmentlist.value, (result) => {
+               history.replace("/changeEventSuccess/");
+             });
+         };
+          this.forceUpdate();
+        });
+
+       this.refs.backToEventButton.onclick = () => {
+         history.replace("/adminEvents/");
+       }
+
+      }
   }
 
+  class ChangeEventSuccess extends React.Component {
+    constructor(props) {
+      super(props);
+
+      var user = userService.getSignedInUser();
+      this.user = user;
+    }
+    render() {
+      return (
+        <div>
+        <div>
+        <h2>Dine endringer er oppdatert!</h2>
+        <h4>Tilbake til arrangementer:</h4>
+        <button ref="backToEventButton">Arrangementer</button>
+        </div>
+        </div>
+      )
+    }
+    componentDidMount() {
+      var user = userService.getSignedInUser();
+      this.user = user;
+      this.refs.backToEventButton.onclick = () => {
+        history.replace("/adminEvents/");
+      }
+    }
+  }
 class Events extends React.Component {
   constructor(props) {
     super(props);
@@ -856,6 +1091,7 @@ class Events extends React.Component {
       <div>
       <h2>Arrangementer:</h2>
       <button ref="backToProfileButton">Din profil</button>
+      <h2> Dine vakt poeng: {this.user.points} </h2>
       </div>
       <div>
         <ul>{listEvents}</ul>
@@ -904,6 +1140,7 @@ class UserEventDetails extends React.Component {
       <div>
       <button ref="backToProfileButton">Din profil</button>
       <button ref="backToEventsButton">Arrangementer</button>
+      <h2> Dine vakt poeng: {this.user.points} </h2>
       </div>
       <div>
       <h2>{this.event.arrangement_Name}</h2>
@@ -1383,9 +1620,13 @@ ReactDOM.render((
         <Route exact path="/profileAdminAccess/:id" component={ProfileAdminAccess} />
         <Route exact path="/newUsersDisplay" component={NewUsersDisplay} />
         <Route exact path="/newProfileAdminAccess/:id" component={NewProfileAdminAccess} />
+        <Route exact path="/deletedUsersDisplay" component={DeletedUsersDisplay} />
+        <Route exact path="/deletedProfileAdminAccess/:id" component={DeletedProfileAdminAccess} />
         <Route exact path="/adminEvents/" component={AdminEvents} />
         <Route exact path="/events/" component={Events} />
         <Route exact path="/eventDetails/:id" component={EventDetails} />
+        <Route exact path="/changeEvent/:id" component={ChangeEvent} />
+        <Route exact path="/changeEventSuccess/" component={ChangeEventSuccess} />
         <Route exact path="/userEventDetails/:id" component={UserEventDetails} />
         <Route exact path="/createEvent" component={CreateEvent} />
         <Route exact path="/eventConfirmation/" component={EventConfirmation} />
