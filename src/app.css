@@ -1,0 +1,112 @@
+.loginScreenCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.createUserCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.userProfileCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.forgottenPasswordCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.contactAdminCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.eventsCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.otherUsersCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.rk2 {
+  width: 50%;
+  height: auto;
+}
+
+#loginButton {
+  margin-top: 5%;
+}
+
+#forgottenPasswordButton {
+    margin-top: 3%;
+}
+
+#otherUsersButton {
+    margin-top: 6%;
+}
+
+#contactAdminButton {
+  margin-top: 2%;
+}
+
+::-webkit-input-placeholder {
+   color: #808080;
+   text-align: center;
+}
+
+:-moz-placeholder {
+   color: #808080;
+   text-align: center;
+}
+
+#eventList {
+  list-style-type: none;
+margin-right: 30%;
+}

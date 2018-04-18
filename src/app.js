@@ -16,21 +16,17 @@ class LoginScreen extends React.Component {
   }
 
   render() {
-    return (<div>
-      <h2>Email:</h2>
-      <input type="text" ref="inputEmail"/>
-      <h2>Passord:</h2>
-      <input type="password" ref="inputPassword"/>
+    return (<div className="loginScreenCSS" align="center">
+    <img src="img/rk3.png" className="rk2" alt="Logo for Røde Kors" />
+      <br />
+      <input type="text" placeholder="Email" ref="inputEmail"/>
+      <br />
+      <input type="password" placeholder="Passord" ref="inputPassword"/>
       <div id="loginError"></div>
-      <button ref="userLoginButton">Logg inn</button>
-
-      <div>
-        <h2>Glemt passord:</h2>
-        <button ref="forgotPasswordButton">Hent passord</button>
-      </div>
-      <div>
-        <h2>Opprett bruker:</h2>
-        <button ref="createUserButton">Ny bruker</button>
+      <button type="button" className="btn btn-primary" id="loginButton" ref="userLoginButton">Logg inn</button>
+      <div className="ekstraFunksjoner">
+        <button type="button" className="btn btn-link" ref="forgotPasswordButton">Glemt passord?</button>
+        <button type="button" className="btn btn-link" ref="createUserButton">Bli medlem</button>
       </div>
     </div>);
   }
@@ -48,7 +44,6 @@ class LoginScreen extends React.Component {
         } else {
           userService.checkAdmin(this.refs.inputEmail.value, () => {
             var AdminUser = userService.getSignedInUser();
-            console.log(user);
             if (AdminUser.isAdmin) {
               history.replace("profile/admin/:" + user.email + "");
             } else {
@@ -79,15 +74,25 @@ class UserProfile extends React.Component {
 
     var user = userService.getSignedInUser();
     this.user = user;
+    this.rolle = [];
+    this.kvali = [];
   }
 
   render() {
     var user = userService.getSignedInUser();
     this.user = user;
-    console.log(user);
-    return (<div>
+    this.id = user.id;
+    let rolleList = [];
+    for (let rolle of this.rolle) {
+      rolleList.push(<li key={rolle}>{rolle}</li>);
+    }
+    let kvaliList = [];
+    for (let kvali of this.kvali) {
+      kvaliList.push(<li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>);
+    }
+    return (<div className="userProfileCSS" align="center">
       <div>
-        <h2>Din profil</h2>
+        <h3>Din profil:</h3>
         <button ref="eventsButton">Arrangementer</button>
         <button ref="otherUsersButton">Søk opp medlem</button>
         <button ref="contactAdminButton">Kontakt admin</button>
@@ -96,18 +101,21 @@ class UserProfile extends React.Component {
         <button ref="userLogoutButton">Logg ut</button>
       </div>
       <div>
-        <h2>Fornavn: {this.user.firstName}</h2>
-        <h2>Etternavn: {this.user.lastName}</h2>
+        <p>Fornavn: {this.user.firstName}</p>
 
-        <h2>Addresse: {this.user.address}</h2>
-        <h2>Telefonnummer: {this.user.phonenumber}</h2>
+        <p>Etternavn: {this.user.lastName}</p>
 
-        <h2>Kompetanse:
-        </h2>
-        <h2>Status: {this.user.status}</h2>
+        <p>Addresse: {this.user.address}</p>
 
-        <h2>Vaktpoeng: {this.user.points}
-        </h2>
+        <p>Telefonnummer: {this.user.phonenumber}</p>
+
+        <p>Kompetanse: {kvaliList}</p>
+
+        <p>Mulige roller: {rolleList}</p>
+
+        <p>Status: {this.user.status}</p>
+
+        <p>Vaktpoeng: {this.user.points}</p>
         <button ref="changeProfileDetailsButton">Endre detaljer</button>
       </div>
     </div>);
@@ -129,6 +137,14 @@ class UserProfile extends React.Component {
     this.refs.changeProfileDetailsButton.onclick = () => {
       history.replace("/changeProfile/");
     }
+    userService.getCompetence(this.id, (result) => {
+      this.kvali = result;
+      this.forceUpdate();
+    });
+    userService.hentRolle(this.id, (result) => {
+      this.rolle = result;
+      this.forceUpdate();
+    });
   }
 }
 
@@ -140,41 +156,23 @@ class ContactAdmin extends React.Component {
     super(props);
   }
   render() {
-    return (<div>
+    return (<div className="contactAdminCSS" align="center">
       <div>
-        <nav>
-          <ul>
-            <h1>Kontakt admin</h1>
-            <li>
-              <button ref="eventButton">Arrangementer</button>
-            </li>
-            <li>
-              <button ref="backToProfileButton">Tilbake til forsiden</button>
-            </li>
-          </ul>
-        </nav>
+        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
+            <h3>Kontakt admin</h3>
       </div>
       <div>
-        <h4>Din email:</h4>
+        <input type="email" placeholder="Din email" ref="yourEmail"/>
         <br/>
-        <input type="email" ref="yourEmail"/>
+        <input type="text" placeholder="Emne" ref="subject"/>
         <br/>
-        <h4>Emne:</h4>
+    <textarea placeholder="Skriv inn meldingen din her" ref="contentEmail" rows="4" cols="19"></textarea>
         <br/>
-        <input type="text" ref="subject"/>
-        <br/>
-        <h4>Innhold:</h4>
-        <br/>
-        <input type="text" ref="contentEmail"/>
-        <br/>
-        <button ref="sendEmail">Send</button>
+        <button type="button" id="contactAdminButton" className="btn btn-primary" ref="sendEmail">Send</button>
       </div>
     </div>);
   }
   componentDidMount() {
-    this.refs.eventButton.onclick = () => {
-      history.replace("/events/");
-    }
     var user = userService.getSignedInUser();
     this.user = user;
     this.refs.backToProfileButton.onclick = () => {
@@ -262,10 +260,34 @@ class ChangeProfile extends React.Component {
         <input type="text" ref="changeAddress"/>
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
         <input type="text" ref="changePhonenumber"/>
+        <h2>Kompetanse: </h2>
+          <select ref="addCompetence">
+                <option value="">Ingen</option>
+                <optgroup label="Førerkort">
+                  <option value="Førerkort 160 utrykningskjøring">Førerkort 160 utrykningskjøring</option>
+                  <option value="Førerkort S snøscooter">Førerkort S snøscooter</option>
+                  <option value="Førerkort BE tilhenger">Førerkort BE tilhenger</option>
+                </optgroup>
+                <optgroup label="Kurs og prøver">
+                  <option value="Ambulansesertifisering">Ambulansesertifisering</option>
+                  <option value="Båtførerprøven">Båtførerprøven</option>
+                  <option value="Distriktsensorkurs">Distriktsensorkurs</option>
+                  <option value="Hjelpekorpsprøve">Hjelpekorpsprøve</option>
+                  <option value="Kvalifisert ATV kurs">Kvalifisert ATV kurs</option>
+                  <option value="Kvalifisert kurs søk og redning">Kvalifisert kurs søk og redning</option>
+                  <option value="Kvalifisert kurs søk og redning sommer">Kvalifisert kurs søk og redning sommer</option>
+                  <option value="Kvalifisert kurs søk og redning vinter">Kvalifisert kurs søk og redning vinter</option>
+                  <option value="Kvalifisert snøscooterkurs">Kvalifisert snøscooterkurs</option>
+                  <option value="Kvalifisert sjøredningskurs">Kvalifisert sjøredningskurs</option>
+                  <option value="Maritimt VHF-sertifikat">Maritimt VHF-sertifikat</option>
+                  <option value="Vaktlederkurs">Vaktlederkurs</option>
+                  <option value="Videregående sjøredningskurs">Videregående sjøredningskurs</option>
+                  <option value="Videregående førstehjelpskurs">Videregående førstehjelpskurs</option>
+                </optgroup>
 
-        <h2>Kompetanse:</h2>
-        <input type="text" ref="changeCompetence"/>
-
+                </select>
+                <h4>Gyldig fra:</h4>
+                <input type="date" ref="Validity_From" />
         <button ref="changeUserDetailsButton">Endre detaljer</button>
       </div>
     </div>);
@@ -273,11 +295,11 @@ class ChangeProfile extends React.Component {
   componentDidMount() {
     var user = userService.getSignedInUser();
     this.user = user;
-    this.refs.changeUserDetailsButton.onclick = () => {
-      userService.changeUserProfile(this.refs.changeFirstName.value, this.refs.changeLastName.value, this.refs.changeAddress.value, this.refs.changePhonenumber.value, this.user.email, this.user.password, (user) => {
+    this.id = user.id;
+    this.refs.changeUserDetailsButton.onclick = () =>
+      userService.changeUserProfile(this.refs.changeFirstName.value, this.refs.changeLastName.value, this.refs.changeAddress.value, this.refs.changePhonenumber.value, this.user.email, this.user.password, this.refs.addCompetence.value, this.refs.Validity_From.value, this.id, (user) => {
         history.replace("/changeProfileSuccess/");
       });
-    }
     this.refs.backToProfileButton.onclick = () => {
       history.replace("/profile/:" + user.email + "");
     }
@@ -333,14 +355,14 @@ class OtherUsers extends React.Component {
           }</Link>
       </li>);
     }
-    return (<div>
+    return (<div className="otherUsersCSS" align="center">
       <div>
-        <button ref="backToProfileButton">Din profil</button>
+        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
       </div>
       <div>
-        <h2>Søk opp bruker:</h2>
-        <input type="text" ref="searchInput"></input>
-        <button ref="searchUserButton">Søk</button>
+        <h3>Søk opp bruker:</h3>
+        <input type="text" ref="searchInput"></input> <br />
+        <button type="button" id="otherUsersButton" className="btn btn-primary" ref="searchUserButton">Søk</button>
         <div id="searchResults">{listUsers}</div>
       </div>
     </div>)
@@ -378,13 +400,14 @@ class ProfileAccess extends React.Component {
       </div>
       <div>
         <h2>Fornavn: {this.user.firstName}</h2>
+
         <h2>Etternavn: {this.user.lastName}</h2>
 
         <h2>Addresse: {this.user.address}</h2>
+
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
 
-        <h2>Kompetanse:
-        </h2>
+        <h2>Kompetanse: </h2>
       </div>
     </div>)
   }
@@ -426,13 +449,14 @@ class UserProfileAdmin extends React.Component {
       </div>
       <div>
         <h2>Fornavn: {this.user.firstName}</h2>
+
         <h2>Etternavn: {this.user.lastName}</h2>
 
         <h2>Addresse: {this.user.address}</h2>
+
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
 
-        <h2>Kompetanse:
-        </h2>
+        <h2>Kompetanse: </h2>
         <button ref="changeAdminDetailsButton">Endre detaljer</button>
       </div>
     </div>)
@@ -486,9 +510,9 @@ class ChangeAdminProfile extends React.Component {
         <input type="text" ref="changeAddress"/>
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
         <input type="text" ref="changePhonenumber"/>
-
-        <h2>Kompetanse:</h2>
+        <h2>Kompetanse: </h2>
         <input type="text" ref="changeCompetence"/>
+
         <button ref="changeAdminDetailsButton">Endre detaljer</button>
       </div>
     </div>);
@@ -610,8 +634,7 @@ class ProfileAdminAccess extends React.Component {
         <h2>Addresse: {this.user.address}</h2>
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
 
-        <h2>Kompetanse:
-        </h2>
+        <h2>Kompetanse: </h2>
       </div>
     </div>)
   }
@@ -706,8 +729,7 @@ class NewProfileAdminAccess extends React.Component {
         <h2>Addresse: {this.user.address}</h2>
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
 
-        <h2>Kompetanse:
-        </h2>
+        <h2>Kompetanse: </h2>
         <button ref="acceptButton">Godta bruker</button>
         <button ref="denyButton">Avslå bruker</button>
       </div>
@@ -731,12 +753,8 @@ class NewProfileAdminAccess extends React.Component {
     this.refs.deletedUserDisplayButton.onclick = () => {
       history.replace("/deletedUsersDisplay/");
     }
-    console.log(this);
-    console.log(this.user);
 
     this.refs.acceptButton.onclick = () => {
-      console.log(this);
-      console.log(this.user);
       userService.acceptUser((this.user.id), (result) => {
         history.replace("/newUsersDisplay/");
       });
@@ -819,8 +837,7 @@ class DeletedProfileAdminAccess extends React.Component {
         <h2>Addresse: {this.user.address}</h2>
         <h2>Telefonnummer: {this.user.phonenumber}</h2>
 
-        <h2>Kompetanse:
-        </h2>
+        <h2>Kompetanse: </h2>
         <button ref="acceptButton">Reaktiver bruker</button>
       </div>
     </div>)
@@ -843,12 +860,8 @@ class DeletedProfileAdminAccess extends React.Component {
     this.refs.userDisplayButton.onclick = () => {
       history.replace("/usersDisplay/");
     }
-    console.log(this);
-    console.log(this.user);
-
     this.refs.acceptButton.onclick = () => {
-      console.log(this);
-      console.log(this.user);
+
       userService.acceptUser((this.user.id), (result) => {
         history.replace("/deletedUsersDisplay/");
       });
@@ -917,7 +930,6 @@ class EventDetails extends React.Component {
     this.event = [];
   }
   render() {
-    console.log(this.event);
     return (<div>
       <div>
         <button ref="backToAdminProfileButton">Din profil</button>
@@ -989,7 +1001,6 @@ class ChangeEvent extends React.Component {
     this.event = [];
   }
   render() {
-    console.log(this.event);
     return (<div>
       <div>
         <button ref="backToEventButton">Arrangementer</button>
@@ -1095,21 +1106,22 @@ class Events extends React.Component {
   render() {
     let listEvents = [];
     for (let event of this.events) {
-      listEvents.push(<li key={event.ID}>
+      listEvents.push(<li id="eventList" className="list-group-item" key={event.ID}>
         <Link to={"/userEventDetails/" + event.ID + ""}>{event.Arrangement_Name}</Link>
       </li>);
     }
-    return (<div>
+    return (<div className="eventsCSS" align="center">
       <div>
-        <h2>Arrangementer:</h2>
-        <button ref="backToProfileButton">Din profil</button>
-        <h2>
-          Dine vakt poeng: {this.user.points}
-        </h2>
+        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
+        <h3>Arrangementer</h3>
+          <p>
+            Dine vakt poeng: {this.user.points}
+          </p>
       </div>
       <div>
         <ul>{listEvents}</ul>
       </div>
+
     </div>)
   }
   componentDidMount() {
@@ -1137,7 +1149,6 @@ class UserEventDetails extends React.Component {
     this.event = [];
   }
   render() {
-    console.log(this.event);
     return (<div>
       <div>
         <button ref="backToProfileButton">Din profil</button>
@@ -1378,26 +1389,26 @@ class ForgottenPassword extends React.Component {
   }
 
   render() {
-    return (<div>
+    return (<div className="forgottenPasswordCSS" align="center">
       <div>
-        <button ref="backToLoginButton">Tilbake til login</button>
+        <button type="button" className="btn btn-link" ref="backToLoginButton">Tilbake til login</button>
       </div>
       <div>
-        <h2>Skriv inn email:</h2>
-        <input type="text" ref="passwordEmail"/>
-        <button ref="newPasswordRequestButton">Få nytt passord</button>
-        <h3>Viktig: dette vil tilbakestille ditt nåværende passord!</h3>
+        <h3>Tilbakestilling av passord</h3>
+        <input type="text" placeholder="din@epost.no" ref="passwordEmail"/>
+        <br />
+        <button type="button" id="forgottenPasswordButton" className="btn btn-danger" ref="newPasswordRequestButton">Få nytt passord</button>
       </div>
     </div>);
   }
   componentDidMount() {
+    this.refs.backToLoginButton.onclick = () => {
+      history.replace("/");
+    }
     this.refs.newPasswordRequestButton.onclick = () => {
       service.newPassword(this.refs.passwordEmail.value, (user) => {
         history.replace("/passwordConfirmation/");
       });
-      this.refs.backToLoginButton.onclick = () => {
-        history.replace("/");
-      }
     }
   }
 }
@@ -1416,45 +1427,37 @@ class CreateUser extends React.Component {
   }
 
   render() {
-    return (<div>
+    return (<div className="createUserCSS" align="center">
       <div>
-        <button ref="backToLoginButton">Tilbake til login</button>
+        <button type="button" className="btn btn-link" ref="backToLoginButton">Tilbake til login</button>
       </div>
       <div>
-        <h1>Opprett-bruker-side</h1>
+        <h3>Bli medlem</h3>
 
-        <h2>Fornavn:</h2>
-        <input type="text" ref="nFirstname"/>
+        <input type="text" placeholder="Fornavn" ref="nFirstname"/>
         <div id="fnameError"></div>
-        <h2>Etternavn:</h2>
-        <input type="text" ref="nLastname"/>
+        <input type="text" placeholder="Etternavn" ref="nLastname"/>
         <div id="lnameError"></div>
 
-        <h2>Address:</h2>
-        <input type="text" ref="nAddress"/>
+        <input type="text" placeholder="Adresse" ref="nAddress"/>
         <div id="addressError"></div>
 
-        <h2>Epost:</h2>
-        <input type="text" ref="nEmail1"/>
+        <input type="text" placeholder="Epost" ref="nEmail1"/>
         <div id="emailError1"></div>
-        <h2>Bekreft epost:</h2>
-        <input type="text" ref="nEmail2"/>
+        <input type="text" placeholder="Bekreft Epost" ref="nEmail2"/>
         <div id="emailError2"></div>
 
-        <h2>Mobilnummer:</h2>
-        <input type="text" ref="nPhonenumber"/>
+        <input type="text" placeholder="Telefonnummer" ref="nPhonenumber"/>
         <div id="phonenumberError"></div>
 
-        <h2>Passord:</h2>
-        <input type="password" ref="nPassword1"/>
+        <input type="password" placeholder="Nytt passord" ref="nPassword1"/>
         <div id="passwordError1"></div>
-        <h2>Bekreft passord:</h2>
-        <input type="password" ref="nPassword2"/>
+        <input type="password" placeholder="Bekreft nytt passord" ref="nPassword2"/>
         <div id="passwordError2"></div>
 
         <div id="addUserError"></div>
         <p></p>
-        <button ref="addUserButton">Opprett bruker</button>
+        <button type="button" className="btn btn-success"ref="addUserButton">Ferdig</button>
       </div>
     </div>);
   }
@@ -1602,37 +1605,37 @@ class PasswordConfirmation extends React.Component {
 ReactDOM.render((<HashRouter>
   <div>
     <Switch>
-      <Route exact="exact" path="/" component={LoginScreen}/>
-      <Route exact="exact" path="/forgottenPassword/" component={ForgottenPassword}/>
+      <Route exact path="/" component={LoginScreen}/>
+      <Route exact path="/forgottenPassword" component={ForgottenPassword}/>
       //<Route exact="exact" path="/passwordConfirmation/" component={PasswordConfirmation}/>
-      <Route exact="exact" path="/createUser/" component={CreateUser}/>
-      <Route exact="exact" path="/userConfirmation/" component={UserConfirmation}/>
-      <Route exact="exact" path="/profile/:email" component={UserProfile}/>
-      <Route exact="exact" path="/profile/admin/:email" component={UserProfileAdmin}/>
-      <Route exact="exact" path="/changeProfile/" component={ChangeProfile}/>
-      <Route exact="exact" path="/changeProfileSuccess/" component={ChangeProfileSuccess}/>
-      <Route exact="exact" path="/changeAdminProfile/" component={ChangeAdminProfile}/>
-      <Route exact="exact" path="/changeAdminProfileSuccess/" component={ChangeAdminProfileSuccess}/>
-      <Route exact="exact" path="/otherUsers/" component={OtherUsers}/>
-      <Route exact="exact" path="/profileAccess/:id" component={ProfileAccess}/>
-      <Route exact="exact" path="/usersDisplay/" component={UsersDisplay}/>
-      <Route exact="exact" path="/profileAdminAccess/:id" component={ProfileAdminAccess}/>
-      <Route exact="exact" path="/newUsersDisplay" component={NewUsersDisplay}/>
-      <Route exact="exact" path="/newProfileAdminAccess/:id" component={NewProfileAdminAccess}/>
-      <Route exact="exact" path="/deletedUsersDisplay" component={DeletedUsersDisplay}/>
-      <Route exact="exact" path="/deletedProfileAdminAccess/:id" component={DeletedProfileAdminAccess}/>
-      <Route exact="exact" path="/adminEvents/" component={AdminEvents}/>
-      <Route exact="exact" path="/events/" component={Events}/>
-      <Route exact="exact" path="/eventDetails/:id" component={EventDetails}/>
-      <Route exact="exact" path="/changeEvent/:id" component={ChangeEvent}/>
-      <Route exact="exact" path="/changeEventSuccess/" component={ChangeEventSuccess}/>
-      <Route exact="exact" path="/userEventDetails/:id" component={UserEventDetails}/>
-      <Route exact="exact" path="/createEvent" component={CreateEvent}/>
-      <Route exact="exact" path="/eventConfirmation/" component={EventConfirmation}/>
-      <Route exact="exact" path="/contactAdmin/" component={ContactAdmin}/>
-      <Route exact="exact" path="/emailConfirmation/" component={EmailConfirmation}/>
-
+      <Route exact path="/createUser" component={CreateUser}/>
+      <Route exact path="/userConfirmation" component={UserConfirmation}/>
+      <Route exact path="/profile/:email" component={UserProfile}/>
+      <Route exact path="/profile/admin/:email" component={UserProfileAdmin}/>
+      <Route exact path="/changeProfile" component={ChangeProfile}/>
+      <Route exact path="/changeProfileSuccess" component={ChangeProfileSuccess}/>
+      <Route exact path="/changeAdminProfile" component={ChangeAdminProfile}/>
+      <Route exact path="/changeAdminProfileSuccess" component={ChangeAdminProfileSuccess}/>
+      <Route exact path="/otherUsers" component={OtherUsers}/>
+      <Route exact path="/profileAccess/:id" component={ProfileAccess}/>
+      <Route exact path="/usersDisplay" component={UsersDisplay}/>
+      <Route exact path="/profileAdminAccess/:id" component={ProfileAdminAccess}/>
+      <Route exact path="/newUsersDisplay" component={NewUsersDisplay}/>
+      <Route exact path="/newProfileAdminAccess/:id" component={NewProfileAdminAccess}/>
+      <Route exact path="/deletedUsersDisplay" component={DeletedUsersDisplay}/>
+      <Route exact path="/deletedProfileAdminAccess/:id" component={DeletedProfileAdminAccess}/>
+      <Route exact path="/adminEvents" component={AdminEvents}/>
+      <Route exact path="/events" component={Events}/>
+      <Route exact path="/eventDetails/:id" component={EventDetails}/>
+      <Route exact path="/changeEvent/:id" component={ChangeEvent}/>
+      <Route exact path="/changeEventSuccess" component={ChangeEventSuccess}/>
+      <Route exact path="/userEventDetails/:id" component={UserEventDetails}/>
+      <Route exact path="/createEvent" component={CreateEvent}/>
+      <Route exact path="/eventConfirmation" component={EventConfirmation}/>
+      <Route exact path="/contactAdmin" component={ContactAdmin}/>
+      <Route exact path="/emailConfirmation" component={EmailConfirmation}/>
     </Switch>
   </div>
 </HashRouter>
-//<Route exact path="/newUser/:email" component={NewUser} />), document.getElementById("root"));
+//<Route exact path="/newUser/:email" component={NewUser} />
+),document.getElementById("root"));

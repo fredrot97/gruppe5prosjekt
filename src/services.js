@@ -1,7 +1,8 @@
 import mysql from "mysql";
-
+import {roller} from "./roller.js";
 // Setup database server reconnection when server timeouts connection:
 let connection;
+
 function connect() {
   connection = mysql.createConnection({
     host: "mysql.stud.iie.ntnu.no",
@@ -19,8 +20,7 @@ function connect() {
   connection.on("error", (error) => {
     if (error.code === "PROTOCOL_CONNECTION_LOST") { // Reconnect if connection to server is lost
       connect();
-    }
-    else {
+    } else {
       throw error;
     }
   });
@@ -29,7 +29,7 @@ connect();
 
 // Class that performs database queries related to customers
 class User {
-  constructor(id, firstName,lastName,address,email,phonenumber,password,points,status) {
+  constructor(id, firstName, lastName, address, email, phonenumber, password, points, status) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -44,7 +44,7 @@ class User {
 }
 
 class Event {
-  constructor(id, Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link){
+  constructor(id, Arrangement_Name, Description, Meetingpoint, Contact_Name, Contact_Phonenumber, Meetingdate, Start_time, End_time, Equipmentlist, Map_Link) {
     this.id = id;
     this.arrangement_Name = Arrangement_Name;
     this.description = Description;
@@ -71,9 +71,9 @@ class UserService {
     connection.query("SELECT * FROM Events WHERE ID=?", [id], (error, result) => {
       let arrangement = new Event("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
       if (error) throw error;
-      if(result.length == 1) {
-      arrangement = new Event(result[0].ID, result[0].Arrangement_Name, result[0].Description, result[0].Meetingpoint, result[0].Contact_Name, result[0].Contact_Phonenumber, result[0].Meetingdate, result[0].Start_time, result[0].End_time, result[0].Equipmentlist, result[0].Map_Link);
-    }
+      if (result.length == 1) {
+        arrangement = new Event(result[0].ID, result[0].Arrangement_Name, result[0].Description, result[0].Meetingpoint, result[0].Contact_Name, result[0].Contact_Phonenumber, result[0].Meetingdate, result[0].Start_time, result[0].End_time, result[0].Equipmentlist, result[0].Map_Link);
+      }
       callback(arrangement);
     });
   }
@@ -95,9 +95,9 @@ class UserService {
     connection.query("SELECT * FROM Users WHERE ID=?", [id], (error, result) => {
       let nUser = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
       if (error) throw error;
-      if(result.length == 1) {
-      nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0);
-    }
+      if (result.length == 1) {
+        nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0);
+      }
       callback(nUser);
     });
   }
@@ -125,7 +125,7 @@ class UserService {
   }
   denyUser(id, callback) {
     connection.query("DELETE FROM Users WHERE id=?", [id], (error, result) => {
-        console.log(id);
+      console.log(id);
       if (error) throw error;
 
       callback();
@@ -133,7 +133,6 @@ class UserService {
   }
   getSearchUsers(searchInput, callback) {
     connection.query("SELECT * FROM Users WHERE (firstName=? OR lastName=? OR phonenumber=? OR email=? OR status=?) AND status!=? AND status!=?", [searchInput, searchInput, searchInput, searchInput, searchInput, "pending", "deactivated"], (error, result) => {
-      console.log("GETTING RESULTS");
       if (error) throw error;
 
       callback(result);
@@ -143,9 +142,9 @@ class UserService {
     connection.query("SELECT * FROM Users WHERE ID=?", [id], (error, result) => {
       let nUser = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
       if (error) throw error;
-      if(result.length == 1) {
-      nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
-    }
+      if (result.length == 1) {
+        nUser = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
+      }
       callback(nUser);
     });
   }
@@ -157,24 +156,24 @@ class UserService {
     });
   }
   signIn(inputEmail, inputPassword, callback) {
-      connection.query("SELECT * FROM Users WHERE email=? AND password=?", [inputEmail,inputPassword], (error, result) => {
-        let user = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
-        if(result.length == 1) {
-          user = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
-          localStorage.setItem("user", JSON.stringify(user));
-        }
-        callback(user);
+    connection.query("SELECT * FROM Users WHERE email=? AND password=?", [inputEmail, inputPassword], (error, result) => {
+      let user = new User("No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result", "No Result");
+      if (result.length == 1) {
+        user = new User(result[0].ID, result[0].firstName, result[0].lastName, result[0].address, result[0].email, result[0].phonenumber, result[0].password, 0, result[0].status);
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+      callback(user);
     });
   }
   checkAdmin(inputEmail, callback) {
-      connection.query("SELECT * FROM Adminlist WHERE email=?", [inputEmail], (error, result) => {
-        if(result.length == 1){
-          let AdminUser = JSON.parse(localStorage.getItem("user"));
-          AdminUser.isAdmin = true;
-          localStorage.setItem("user", JSON.stringify(AdminUser));
-        }
-        callback();
-      });
+    connection.query("SELECT * FROM Adminlist WHERE email=?", [inputEmail], (error, result) => {
+      if (result.length == 1) {
+        let AdminUser = JSON.parse(localStorage.getItem("user"));
+        AdminUser.isAdmin = true;
+        localStorage.setItem("user", JSON.stringify(AdminUser));
+      }
+      callback();
+    });
   }
   getSignedInUser() {
     return JSON.parse(localStorage.getItem("user"));
@@ -183,10 +182,9 @@ class UserService {
     console.log("Checking Email at Services side");
     let exists = false;
     connection.query("SELECT * FROM Users WHERE email=?", [nEmail1], (error, result) => {
-      if(result.length == 1) {
+      if (result.length == 1) {
         localStorage.setItem("exists", "true");
-      }
-      else {
+      } else {
         localStorage.setItem("exists", "false");
       }
       callback();
@@ -198,31 +196,34 @@ class UserService {
   }
 
   userLogOut() {
-    localStorage.setItem("user","");
+    localStorage.setItem("user", "");
   }
-  changeUserProfile(changeFirstName, changeLastName, changeAddress, changePhonenumber, email, password, callback) {
-    if(changeFirstName != "") {
+  changeUserProfile(changeFirstName, changeLastName, changeAddress, changePhonenumber, email, password, addCompetence, Validity_From, id, callback) {
+    if (changeFirstName != "") {
       connection.query("UPDATE Users SET firstName=? WHERE email=?", [changeFirstName, email], (error, result) => {
         if (error) throw error;
         let NewFirstName = JSON.parse(localStorage.getItem("user"));
         NewFirstName.firstName = changeFirstName;
         localStorage.setItem("user", NewFirstName);
       });
-    } if(changeLastName != "") {
+    }
+    if (changeLastName != "") {
       connection.query("UPDATE Users SET lastName=? WHERE email=?", [changeLastName, email], (error, result) => {
         if (error) throw error;
         let NewLastName = JSON.parse(localStorage.getItem("user"));
         NewLastName.lastName = changeLastName;
         localStorage.setItem("user", NewLastName);
       });
-    } if(changeAddress != "") {
+    }
+    if (changeAddress != "") {
       connection.query("UPDATE Users SET address=? WHERE email=?", [changeAddress, email], (error, result) => {
         if (error) throw error;
         let NewAddress = JSON.parse(localStorage.getItem("user"));
         NewAddress.address = changeAddress;
         localStorage.setItem("user", JSON.stringify(NewAddress));
       });
-    } if(changePhonenumber != "" && !isNaN(changePhonenumber)) {
+    }
+    if (changePhonenumber != "" && !isNaN(changePhonenumber)) {
       connection.query("UPDATE Users SET phonenumber=? WHERE email=?", [changePhonenumber, email], (error, result) => {
         if (error) throw error;
         let NewPhonenumber = JSON.parse(localStorage.getItem("user"));
@@ -230,64 +231,78 @@ class UserService {
         localStorage.setItem("user", JSON.stringify(NewPhonenumber));
       });
     }
-    this.signIn(email,password, (user) => {
+    connection.query("INSERT INTO User_Competence SET User_ID=?, Competence_Name=?, Validity_From=?", [id, addCompetence, Validity_From], (error, result) => {
+      if (error) throw error;
+    });
+
+    this.signIn(email, password, (user) => {
       console.log("Successfully signed in. User object following");
       console.log(userService.getSignedInUser());
     });
     callback();
   }
 
+  getCompetence(id, callback) {
+    connection.query("SELECT * FROM User_Competence WHERE User_ID=?", [id], (error, competence) => {
+      if (error) throw error;
+      callback(competence);
+    });
+  }
+
   changeEvent(id, nEventname, nDescription, nMeetingpoint, nContactperson, nPhonenumberContactperson, nDate, nStartTime, nEndTime, nMap, nEquipmentlist, callback) {
-    console.log("id");
-    if(nEventname != "") {
+    if (nEventname != "") {
       connection.query("UPDATE Events SET arrangement_Name=? WHERE id=?", [nEventname, id], (error, result) => {
         if (error) throw error;
 
       });
-    } if(nDescription != "") {
+    }
+    if (nDescription != "") {
       connection.query("UPDATE Events SET Description=? WHERE id=?", [nDescription, id], (error, result) => {
         if (error) throw error;
 
       });
-    } if(nMeetingpoint != "") {
+    }
+    if (nMeetingpoint != "") {
       connection.query("UPDATE Events SET meetingpoint=? WHERE id=?", [nMeetingpoint, id], (error, result) => {
         if (error) throw error;
 
       });
-    } if(nContactperson != "") {
+    }
+    if (nContactperson != "") {
       connection.query("UPDATE Events SET contact_name=? WHERE id=?", [nContactperson, id], (error, result) => {
         if (error) throw error;
-
       });
-    } if(nPhonenumberContactperson != "") {
+    }
+    if (nPhonenumberContactperson != "") {
       connection.query("UPDATE Events SET contact_phonenumber=? WHERE id=?", [nPhonenumberContactperson, id], (error, result) => {
         if (error) throw error;
-
       });
-    } if(nDate != "") {
+    }
+    if (nDate != "") {
       connection.query("UPDATE Events SET Meetingdate=? WHERE id=?", [nDate, id], (error, result) => {
         if (error) throw error;
 
       });
-    } if(nStartTime != "") {
+    }
+    if (nStartTime != "") {
       connection.query("UPDATE Events SET start_time=? WHERE id=?", [nStartTime, id], (error, result) => {
         if (error) throw error;
 
       });
     }
-    if(nEndTime != "") {
+    if (nEndTime != "") {
       connection.query("UPDATE Events SET end_time=? WHERE id=?", [nEndTime, id], (error, result) => {
         if (error) throw error;
 
       });
     }
-    if(nMap != "") {
+    if (nMap != "") {
       connection.query("UPDATE Events SET map_link=? WHERE id=?", [nMap, id], (error, result) => {
         if (error) throw error;
 
       });
     }
-    if(nEquipmentlist != "") {
+    if (nEquipmentlist != "") {
       connection.query("UPDATE Events SET equipmentlist=? WHERE id=?", [nEquipmentlist, id], (error, result) => {
         if (error) throw error;
 
@@ -306,12 +321,25 @@ class UserService {
   newPassword(passwordEmail, callback) {
     connection.query("SELECT * FROM Users WHERE email=? SET password =", [passwordEmail], (error, result) => {
       if (error) throw error;
-
     });
   }
-
+  hentRolle(id, callback) {
+      let muligRolle = [];
+      let kvaliArray = [];
+      connection.query("SELECT * FROM User_Competence WHERE User_ID=?", [id], (error, result) => {
+        for (let kvali of result) {
+          kvaliArray.push(kvali.Competence_Name);
+        }
+        for (let rolle of roller) {
+          if (rolle.krav.every(v => kvaliArray.indexOf(v) >= 0)){
+            muligRolle.push(rolle.key);
+          }
+        }
+        callback(muligRolle);
+            });
+  }
 }
-
 let userService = new UserService();
-
-export { userService };
+export {
+  userService
+};
