@@ -18,10 +18,12 @@ class LoginScreen extends React.Component {
   render() {
     return (<div className="loginScreenCSS" align="center">
     <img src="img/rk3.png" className="rk2" alt="Logo for Røde Kors" />
-      <br />
-      <input type="text" placeholder="Email" ref="inputEmail"/>
-      <br />
-      <input type="password" placeholder="Passord" ref="inputPassword"/>
+        <div className="input-group">
+      <input id="email" type="text" className="form-control" placeholder="Email" ref="inputEmail"/>
+        </div>
+        <div className="input-group">
+      <input id="password" type="password" className="form-control" placeholder="Passord" ref="inputPassword"/>
+      </div>
       <div id="loginError"></div>
       <button type="button" className="btn btn-primary" id="loginButton" ref="userLoginButton">Logg inn</button>
       <div className="ekstraFunksjoner">
@@ -36,7 +38,7 @@ class LoginScreen extends React.Component {
     this.refs.userLoginButton.onclick = () => {
       userService.signIn(this.refs.inputEmail.value, this.refs.inputPassword.value, (user) => {
         if (user.firstName == "No Result") {
-          document.getElementById("loginError").textContent = "Email or password is incorrect.";
+          document.getElementById("loginError").textContent = "Har du skrevet inn riktig email/passord?";
         } else if (user.status == "deactivated") {
           document.getElementById("loginError").textContent = "Brukeren er deaktivert. Ta kontakt med admin.";
         } else if (user.status == "pending") {
@@ -47,7 +49,7 @@ class LoginScreen extends React.Component {
             if (AdminUser.isAdmin) {
               history.replace("profile/admin/:" + user.email + "");
             } else {
-              history.replace("/profile/:" + user.email + "");
+              history.replace("/mainScreen");
             }
           });
         }
@@ -63,6 +65,54 @@ class LoginScreen extends React.Component {
   //Framtidige funksjoner:
   //*userLoginButton vil ta deg til UserProfile dersom du har skrevet inn riktig email og Passord
   //*passwordForgottenButton vil åpne en boks hvor du kan be om å få passord sendt til email
+}
+
+
+
+class mainScreen extends React.Component {
+  constructor(props) {
+    super(props);
+
+    var user = userService.getSignedInUser();
+    this.user = user;
+  }
+  render() {
+    return (<div className="mainScreenCSS" align="center">
+        <button type="button" id="logOutLinkCSS" className="btn btn-link" ref="userLogoutButton">Logg ut</button>
+        <div>
+      <img src="img/mainmenu.png" className="mainScreenLogo" alt="Logo for hovedmeny" />
+      <h1>Hovedmeny</h1>
+      </div>
+      <div>
+      <button type="button" className="btn" id="buttonsMainScreen" ref="eventsButton">Arrangementer</button> <br />
+      <button type="button" className="btn" id="buttonsMainScreen" ref="contactAdminButton">Kontakt admin</button>
+      </div>
+      <div>
+      <button type="button" className="btn" id="buttonsMainScreen"ref="backToProfileButton">Din profil</button> <br />
+      <button type="button" className="btn" id="buttonsMainScreen" ref="otherUsersButton">Søk opp medlem</button>
+      </div>
+    </div>)
+  }
+  componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    this.refs.backToProfileButton.onclick = () => {
+      history.replace("/profile/:" + user.email + "");
+    }
+    this.refs.userLogoutButton.onclick = () => {
+      userService.userLogOut();
+      history.replace("/");
+    }
+    this.refs.eventsButton.onclick = () => {
+      history.replace("/events/");
+    }
+    this.refs.contactAdminButton.onclick = () => {
+      history.replace("/contactAdmin/");
+    }
+    this.refs.otherUsersButton.onclick = () => {
+      history.replace("/otherUsers/");
+    }
+  }
 }
 
 
@@ -92,13 +142,8 @@ class UserProfile extends React.Component {
     }
     return (<div className="userProfileCSS" align="center">
       <div>
+              <button type="button" className="btn btn-link" ref="backToMainScreenButton">Tilbake til hovedmeny</button>
         <h3>Din profil:</h3>
-        <button ref="eventsButton">Arrangementer</button>
-        <button ref="otherUsersButton">Søk opp medlem</button>
-        <button ref="contactAdminButton">Kontakt admin</button>
-      </div>
-      <div>
-        <button ref="userLogoutButton">Logg ut</button>
       </div>
       <div>
         <p>Fornavn: {this.user.firstName}</p>
@@ -121,18 +166,8 @@ class UserProfile extends React.Component {
     </div>);
   }
   componentDidMount() {
-    this.refs.userLogoutButton.onclick = () => {
-      userService.userLogOut();
-      history.replace("/");
-    }
-    this.refs.eventsButton.onclick = () => {
-      history.replace("/events/");
-    }
-    this.refs.contactAdminButton.onclick = () => {
-      history.replace("/contactAdmin/");
-    }
-    this.refs.otherUsersButton.onclick = () => {
-      history.replace("/otherUsers/");
+    this.refs.backToMainScreenButton.onclick = () => {
+      history.replace("/mainScreen");
     }
     this.refs.changeProfileDetailsButton.onclick = () => {
       history.replace("/changeProfile/");
@@ -158,7 +193,7 @@ class ContactAdmin extends React.Component {
   render() {
     return (<div className="contactAdminCSS" align="center">
       <div>
-        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
+        <button type="button" className="btn btn-link" ref="backToMainScreenButton">Tilbake til hovedmeny</button>
             <h3>Kontakt admin</h3>
       </div>
       <div>
@@ -173,10 +208,8 @@ class ContactAdmin extends React.Component {
     </div>);
   }
   componentDidMount() {
-    var user = userService.getSignedInUser();
-    this.user = user;
-    this.refs.backToProfileButton.onclick = () => {
-      history.replace("/profile/:" + user.email + "");
+    this.refs.backToMainScreenButton.onclick = () => {
+      history.replace("/mainScreen");
     }
     this.refs.sendEmail.onclick = () => {
       let transporter = nodeMailer.createTransport({
@@ -217,21 +250,19 @@ class EmailConfirmation extends React.Component {
   }
 
   render() {
-    return (<div>
+    return (<div className="EmailConfirmationCSS" align="center">
       <div>
-        <button ref="backToProfileButton">Tilbake til profil</button>
+        <button type="button" className="btn btn-link" ref="backToMainScreenButton">Tilbake til hovedmeny</button>
       </div>
       <div>
-        <h2>Meldingen din har blitt sendt!</h2>
-        <h4>Du vil motta et svar så fort som mulig.</h4>
+        <h3>Meldingen din har blitt sendt!</h3>
+        <p>Du vil motta et svar så fort som mulig.</p>
       </div>
     </div>);
   }
   componentDidMount() {
-    var user = userService.getSignedInUser();
-    this.user = user;
-    this.refs.backToProfileButton.onclick = () => {
-      history.replace("/profile/:" + user.email + "");
+    this.refs.backToMainScreenButton.onclick = () => {
+      history.replace("/mainScreen");
     }
   }
 }
@@ -357,7 +388,7 @@ class OtherUsers extends React.Component {
     }
     return (<div className="otherUsersCSS" align="center">
       <div>
-        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
+        <button type="button" className="btn btn-link" ref="backToMainScreenButton">Tilbake til hovedmeny</button>
       </div>
       <div>
         <h3>Søk opp bruker:</h3>
@@ -368,10 +399,8 @@ class OtherUsers extends React.Component {
     </div>)
   }
   componentDidMount() {
-    var user = userService.getSignedInUser();
-    this.user = user;
-    this.refs.backToProfileButton.onclick = () => {
-      history.replace("/profile/:" + user.email + "");
+    this.refs.backToMainScreenButton.onclick = () => {
+      history.replace("/mainScreen");
     }
     this.refs.searchUserButton.onclick = () => {
       userService.getSearchUsers(this.refs.searchInput.value, (result) => {
@@ -1112,7 +1141,7 @@ class Events extends React.Component {
     }
     return (<div className="eventsCSS" align="center">
       <div>
-        <button type="button" className="btn btn-link" ref="backToProfileButton">Tilbake til forsiden</button>
+        <button type="button" className="btn btn-link" ref="backToMainScreenButton">Tilbake til hovedmeny</button>
         <h3>Arrangementer</h3>
           <p>
             Dine vakt poeng: {this.user.points}
@@ -1129,10 +1158,8 @@ class Events extends React.Component {
       this.events = result;
       this.forceUpdate();
     });
-    var user = userService.getSignedInUser();
-    this.user = user;
-    this.refs.backToProfileButton.onclick = () => {
-      history.replace("/profile/:" + user.email + "");
+    this.refs.backToMainScreenButton.onclick = () => {
+      history.replace("/mainScreen");
     }
   }
 }
@@ -1634,6 +1661,7 @@ ReactDOM.render((<HashRouter>
       <Route exact path="/eventConfirmation" component={EventConfirmation}/>
       <Route exact path="/contactAdmin" component={ContactAdmin}/>
       <Route exact path="/emailConfirmation" component={EmailConfirmation}/>
+      <Route exact path="/mainScreen" component={mainScreen}/>
     </Switch>
   </div>
 </HashRouter>

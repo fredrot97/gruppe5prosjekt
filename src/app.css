@@ -75,9 +75,58 @@
   transform: translate(-50%, -50%);
 }
 
+.mainScreenCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.EmailConfirmationCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
 .rk2 {
   width: 50%;
   height: auto;
+}
+
+.form-control {
+}
+
+.mainScreenLogo {
+  width: 25%;
+  height: auto;
+  margin-top: 2%;
+}
+
+#buttonsMainScreen {
+font-size: 24px;
+background-color: white;
+border: 1px solid black;
+margin-top: 3%;
+}
+
+#buttonsMainScreen:hover {
+  background-color: #747474;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 27px 24px 0 rgba(0,0,0,0.24), 0 20px 50px 0 rgba(0,0,0,0.19);
+}
+
+#logOutLinkCSS {
+  color: red;
 }
 
 #loginButton {
