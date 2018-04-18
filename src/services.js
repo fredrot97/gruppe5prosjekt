@@ -467,11 +467,28 @@ class UserService {
       }
     );
   }
-
   isEmailTaken() {
-    return localStorage.getItem("exists") == "true";
+    return localStorage.getItem("pExists") == "true";
   }
-
+  checkPhonenumber(nPhonenumber, callback) {
+    let exists = false;
+    connection.query(
+      "SELECT * FROM Users WHERE phonenumber=?",
+      [nPhonenumber],
+      (error, result) => {
+        if (result.length == 1) {
+          localStorage.setItem("pExists", "true");
+        } else {
+          localStorage.setItem("pExists", "false");
+        }
+        callback();
+      }
+    );
+  }
+  isPhonenumberTaken() {
+    console.log("It's working.");
+    return localStorage.getItem("pExists") == "true";
+  }
   userLogOut() {
     localStorage.setItem("user", "");
   }
@@ -667,7 +684,8 @@ class UserService {
     }
     callback();
   }
-  //eventInterest legger en bruker til som interessert i et spesifikt arrangement
+  //eventInterest legger en bruker til som interessert i et spesifikt
+  //arrangement
   eventInterest(event_id, user_id, callback) {
     connection.query(
       "INSERT INTO Event_Interested (Arrangement_ID, User_ID) values (?,?)",
@@ -679,6 +697,8 @@ class UserService {
       }
     );
   }
+  //getEventInterest sjekker om en bruker allerede er interessert i et
+  //arrangement
   getEventInterest(event_id, user_id, callback) {
     let iExists = false;
     connection.query(

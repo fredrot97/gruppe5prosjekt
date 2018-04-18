@@ -1109,6 +1109,7 @@ class EventDetails extends React.Component {
           <h4>{this.event.equipmentlist}</h4>
           <h3>Kartlenke:</h3>
           <h4>{this.event.map_link}</h4>
+          <button ref="completeEventButton">Fullfør arrangement</button>
         </div>
       </div>
     );
@@ -1137,6 +1138,9 @@ class EventDetails extends React.Component {
           userService.deleteEvent(this.event.id, () => {
             history.replace("/adminEvents/");
           });
+        };
+        this.refs.completeEventButton.onclick = () => {
+          history.replace("/adminEvents/");
         };
         this.forceUpdate();
       }
@@ -1180,6 +1184,12 @@ class EventPersonnel extends React.Component {
     return (
       <div>
         <div>
+          <button ref="backToEventButton">
+            Tilbake til arrangement detaljer
+          </button>
+          <button ref="backToAdminEventsButton">Arrangementer</button>
+        </div>
+        <div>
           <h2>Interesserte brukere:</h2>
           <h4>Liste over interesserte medlemmer etter flest vaktpoeng:</h4>
           <ul>{listPointUsers}</ul>
@@ -1190,10 +1200,7 @@ class EventPersonnel extends React.Component {
           <ul>{listLeastPointUsers}</ul>
         </div>
         <div>
-          <button ref="backToAdminEventsButton">Arrangementer</button>
-          <button ref="backToEventButton">
-            Tilbake til arrangement detaljer
-          </button>
+          <button ref="choosePersonnelButton">Velg manskap</button>
         </div>
       </div>
     );
@@ -1201,25 +1208,25 @@ class EventPersonnel extends React.Component {
 
   componentDidMount() {
     userService.getEvent(
-      this.props.location.pathname.substring(16),
+      this.props.location.pathname.substring(17),
       arrangement => {
         this.event = arrangement;
+        console.log(this.props.location.pathname);
         this.refs.backToAdminEventsButton.onclick = () => {
           history.replace("/adminEvents/");
         };
         this.refs.backToEventButton.onclick = () => {
           history.replace("/eventDetails/:" + this.event.id);
         };
+        this.refs.choosePersonnelButton.onclick = () => {};
         console.log(this.event.id);
         userService.getInterestedUsers(this.event.id, result => {
           this.pointUsers = result;
-          this.forceUpdate();
+          userService.getPointsUsers(nResult => {
+            this.leastPointUsers = nResult;
+            this.forceUpdate();
+          });
         });
-        userService.getPointsUsers(nResult => {
-          this.leastPointUsers = nResult;
-          this.forceUpdate();
-        });
-        this.forceUpdate();
       }
     );
   }
@@ -1845,8 +1852,6 @@ class CreateUser extends React.Component {
         isValidInput = false;
       }
       //Sjekker om innskrevne emailer samsvarer, samt om noen av feltene er tomme
-      //*Framtidige funksjoner: sjekke at emailen ikke allerede eksisterer
-      //*Framtidige funksjoner: sjekke at emailen inneholder riktige tegn, f.eks. @
       if (
         isNaN(this.refs.nPhonenumber.value) ||
         this.refs.nPhonenumber.value == ""
@@ -1856,6 +1861,12 @@ class CreateUser extends React.Component {
           "Ugyldig telefonnummer.";
       } else {
         document.getElementById("phonenumberError").textContent = "";
+      }
+      userService.checkPhonenumber(this.refs.nPhonenumber.value, () => {});
+      if (userService.isPhonenumberTaken(this.refs.nPhonenumber.value)) {
+        document.getElementById("phonenumberError").textContent =
+          "Telefonnummer er allerede i bruk.";
+        isValidInput = false;
       }
       //Sjekker om nummer kun inneholder tall og om boksen er tom
       //*Framtidige funksjoner: Sjekke at nummeret er 8 siffer langt
