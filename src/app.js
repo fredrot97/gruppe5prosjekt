@@ -103,7 +103,7 @@ class LoginScreen extends React.Component {
   }
 }
 
-class mainScreen extends React.Component {
+class MainScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -201,12 +201,32 @@ class UserProfile extends React.Component {
     this.user = user;
     this.rolle = [];
     this.kvali = [];
+    this.events = [];
+  }
+
+  confirmUserForEvent(event_ID) {
+    userService.confirmUserForEvent(this.user.ID, event_ID, () => {});
+    this.updateEvents(event_ID);
+  }
+
+  denyUserForEvent(event_ID) {
+    userService.denyUserForEvent(this.user.ID, event_ID, () => {});
+    this.updateEvents(event_ID);
+  }
+
+  updateEvents(event_ID) {
+    for (var i = 0; i < this.events.length; i++) {
+      if (this.events[i] == event_ID) {
+        this.events.splice(i, 1);
+      }
+    }
+    this.forceUpdate();
   }
 
   render() {
     var user = userService.getSignedInUser();
     this.user = user;
-    this.id = user.id;
+    this.ID = user.ID;
     let rolleList = [];
     for (let rolle of this.rolle) {
       rolleList.push(<li key={rolle}>{rolle}</li>);
@@ -215,6 +235,20 @@ class UserProfile extends React.Component {
     for (let kvali of this.kvali) {
       kvaliList.push(
         <li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
+      );
+    }
+    let eventList = [];
+    for (let event_ID of this.events) {
+      eventList.push(
+        <li key={event_ID}>
+          <Link to={"/userEventDetails/:" + event_ID + ""}> {event_ID}</Link>
+          <button onClick={() => this.confirmUserForEvent(event_ID)}>
+            Bekreft deltagelse
+          </button>
+          <button onClick={() => this.denyUserForEvent(event_ID)}>
+            Avkreft deltagelse
+          </button>
+        </li>
       );
     }
     return (
@@ -229,6 +263,7 @@ class UserProfile extends React.Component {
           </button>
           <h3>Din profil:</h3>
         </div>
+        <div id="UserCallout"> {eventList} </div>
         <div>
           <p>Fornavn: {this.user.firstName}</p>
 
@@ -244,6 +279,8 @@ class UserProfile extends React.Component {
 
           <p>Status: {this.user.status}</p>
 
+          <button ref="activatePassiveButton"> Oppdater status </button>
+
           <p>Vaktpoeng: {this.user.points}</p>
           <button ref="changeProfileDetailsButton">Endre detaljer</button>
         </div>
@@ -251,21 +288,25 @@ class UserProfile extends React.Component {
     );
   }
   componentDidMount() {
+    var user = userService.getSignedInUser();
+    this.user = user;
+    userService.getRelevantEvents(this.user.ID, result => {
+      this.events = result;
+      this.forceUpdate();
+    });
     this.refs.backToMainScreenButton.onclick = () => {
       history.replace("/mainScreen");
     };
     this.refs.changeProfileDetailsButton.onclick = () => {
       history.replace("/changeProfile/");
     };
-    var user = userService.getSignedInUser();
-    this.user = user;
     this.refs.activatePassiveButton.onclick = () => {
       if (this.user.status == "active") {
-        userService.changeToInactive(this.user.id, result => {
+        userService.changeToInactive(this.user.ID, result => {
           this.forceUpdate();
         });
       } else if (this.user.status == "inactive") {
-        userService.changeToActive(this.user.id, result => {
+        userService.changeToActive(this.user.ID, result => {
           this.forceUpdate();
         });
       }
@@ -472,7 +513,7 @@ class ChangeProfile extends React.Component {
   componentDidMount() {
     var user = userService.getSignedInUser();
     this.user = user;
-    this.id = user.id;
+    this.ID = user.ID;
     this.refs.changeUserDetailsButton.onclick = () =>
       userService.changeUserProfile(
         this.refs.changeFirstName.value,
@@ -534,7 +575,7 @@ class OtherUsers extends React.Component {
       listUsers.push(
         <li key={user.ID}>
           <Link to={"/profileAccess/" + user.ID + ""}>
-            {(user.firstName, user.lastName)}
+            {user.firstName} {user.lastName}
           </Link>
         </li>
       );
@@ -611,7 +652,6 @@ class ProfileAccess extends React.Component {
       this.props.location.pathname.substring(15),
       nUser => {
         this.user = nUser;
-        console.log(nUser);
         this.forceUpdate();
       }
     );
@@ -729,6 +769,15 @@ class UsersDisplay extends React.Component {
       this.aUsers = result;
       this.forceUpdate();
     });
+    this.refs.newUserDisplayButton.onclick = () => {
+      history.replace("/newUsersDisplay/");
+    };
+    this.refs.userDisplayButton.onclick = () => {
+      history.replace("/usersDisplay/");
+    };
+    this.refs.deletedUserDisplayButton.onclick = () => {
+      history.replace("/deletedUsersDisplay/");
+    };
   }
 }
 
@@ -766,7 +815,6 @@ class ProfileAdminAccess extends React.Component {
   componentDidMount() {
     userService.getUser(this.props.location.pathname.substring(20), nUser => {
       this.user = nUser;
-      console.log(nUser);
       this.forceUpdate();
     });
     this.refs.adminEventButton.onclick = () => {
@@ -782,7 +830,7 @@ class ProfileAdminAccess extends React.Component {
       history.replace("/deletedUsersDisplay/");
     };
     this.refs.deactiveUserButton.onclick = () => {
-      userService.deactivateUser(this.user.id, () => {
+      userService.deactivateUser(this.user.ID, () => {
         history.replace("/usersDisplay/");
       });
     };
@@ -878,7 +926,6 @@ class NewProfileAdminAccess extends React.Component {
   componentDidMount() {
     userService.getUser(this.props.location.pathname.substring(23), nUser => {
       this.user = nUser;
-      console.log(nUser);
       this.forceUpdate();
     });
     this.refs.adminEventButton.onclick = () => {
@@ -893,18 +940,14 @@ class NewProfileAdminAccess extends React.Component {
     this.refs.deletedUserDisplayButton.onclick = () => {
       history.replace("/deletedUsersDisplay/");
     };
-    console.log(this);
-    console.log(this.user);
 
     this.refs.acceptButton.onclick = () => {
-      console.log(this);
-      console.log(this.user);
-      userService.acceptUser(this.user.id, result => {
+      userService.acceptUser(this.user.ID, result => {
         history.replace("/newUsersDisplay/");
       });
     };
     this.refs.denyButton.onclick = () => {
-      userService.denyUser(this.user.id, result => {
+      userService.denyUser(this.user.ID, result => {
         history.replace("/newUsersDisplay/");
       });
     };
@@ -1014,7 +1057,7 @@ class DeletedProfileAdminAccess extends React.Component {
       history.replace("/usersDisplay/");
     };
     this.refs.acceptButton.onclick = () => {
-      userService.acceptUser(this.user.id, result => {
+      userService.acceptUser(this.user.ID, result => {
         history.replace("/deletedUsersDisplay/");
       });
     };
@@ -1034,7 +1077,7 @@ class AdminEvents extends React.Component {
     for (let event of this.events) {
       listEvents.push(
         <li key={event.ID}>
-          <Link to={"/eventDetails/" + event.ID + ""}>
+          <Link to={"/eventDetails/:" + event.ID + ""}>
             {event.Arrangement_Name}
           </Link>
           <div>{event.Description}</div>
@@ -1119,7 +1162,7 @@ class EventDetails extends React.Component {
     var user = userService.getSignedInUser();
     this.user = user;
     userService.getEvent(
-      this.props.location.pathname.substring(14),
+      this.props.location.pathname.substring(15),
       arrangement => {
         this.event = arrangement;
         this.refs.backToAdminEventsButton.onclick = () => {
@@ -1129,13 +1172,13 @@ class EventDetails extends React.Component {
           history.replace("/profile/admin/:" + user.email + "");
         };
         this.refs.changeEventButton.onclick = () => {
-          history.replace("/changeEvent/" + this.event.id);
+          history.replace("/changeEvent/" + this.event.ID);
         };
         this.refs.validUsersButton.onclick = () => {
-          history.replace("/eventPersonnel/:" + this.event.id);
+          history.replace("/eventPersonnel/:" + this.event.ID);
         };
         this.refs.deleteEventButton.onclick = () => {
-          userService.deleteEvent(this.event.id, () => {
+          userService.deleteEvent(this.event.ID, () => {
             history.replace("/adminEvents/");
           });
         };
@@ -1145,6 +1188,9 @@ class EventDetails extends React.Component {
         this.forceUpdate();
       }
     );
+    this.refs.completeEventButton.onclick = () => {
+      service.completeEvent(this.event.ID);
+    };
   }
 }
 class EventPersonnel extends React.Component {
@@ -1155,7 +1201,82 @@ class EventPersonnel extends React.Component {
     this.user = user;
     this.pointUsers = [];
     this.leastPointUsers = [];
+    this.usedUsers = [];
   }
+
+  updateListsByUserID(ID) {
+    for (var a = 0; a < this.pointUsers.length; a++) {
+      if (ID == this.pointUsers[a].ID) {
+        this.usedUsers.push(
+          userService.makeUserIntoEventUser(this.pointUsers[a])
+        );
+        this.pointUsers.splice(a, 1);
+      }
+    }
+    for (var b = 0; b < this.leastPointUsers.length; b++) {
+      if (ID == this.leastPointUsers[b].ID) {
+        this.usedUsers.push(
+          userService.makeUserIntoEventUser(this.leastPointUsers[b])
+        );
+        this.leastPointUsers.splice(b, 1);
+      }
+    }
+  }
+
+  revertListsByUserID(ID) {
+    for (var a = 0; a < this.usedUsers.length; a++) {
+      if (this.usedUsers[a].ID == ID) {
+        var c = -1;
+        for (var b = this.leastPointUsers.length - 1; b > -1; b--) {
+          if (this.usedUsers[a].points < this.leastPointUsers[b].points) {
+            c = b;
+          }
+        }
+        if (c == -1) {
+          this.leastPointUsers.push(this.usedUsers[a]);
+        } else {
+          this.leastPointUsers.splice(c, 0, this.usedUsers[a]);
+        }
+        this.usedUsers.splice(a, 1);
+      }
+    }
+  }
+
+  addUserToEvent(user_id) {
+    userService.addUserToEvent(
+      user_id,
+      this.props.location.pathname.substring(17),
+      () => {}
+    );
+    this.updateListsByUserID(user_id);
+    this.forceUpdate();
+  }
+
+  removeUserFromEvent(user_id) {
+    userService.removeUserFromEvent(
+      user_id,
+      this.props.location.pathname.substring(17),
+      () => {}
+    );
+    this.revertListsByUserID(user_id);
+    this.forceUpdate();
+  }
+
+  updateLists() {
+    for (var i = 0; i < this.usedUsers.length; i++) {
+      for (var a = 0; a < this.pointUsers.length; a++) {
+        if (this.usedUsers[i].ID == this.pointUsers[a].ID) {
+          this.pointUsers.splice(a, 1);
+        }
+      }
+      for (var b = 0; b < this.leastPointUsers.length; b++) {
+        if (this.usedUsers[i].ID == this.leastPointUsers[b].ID) {
+          this.leastPointUsers.splice(b, 1);
+        }
+      }
+    }
+  }
+
   render() {
     let listPointUsers = [];
     for (let pointUser of this.pointUsers) {
@@ -1165,7 +1286,10 @@ class EventPersonnel extends React.Component {
             {pointUser.firstName} {pointUser.lastname}
           </Link>
           <div>Points: {pointUser.points}</div>
-          <div>Aktuelle roller: {pointUser.Competence_Name}</div>
+          <div>Aktuelle roller: {pointUser.rolleList}</div>
+          <button onClick={() => this.addUserToEvent(pointUser.ID)}>
+            Legg til manskap
+          </button>
         </li>
       );
     }
@@ -1177,7 +1301,26 @@ class EventPersonnel extends React.Component {
             {leastPointUser.firstName} {leastPointUser.lastname}
           </Link>
           <div>Points: {leastPointUser.points}</div>
-          <div>Aktuelle roller: {leastPointUser.Competence_Name}</div>
+          <div>Aktuelle roller: {leastPointUser.rolleList}</div>
+          <button onClick={() => this.addUserToEvent(leastPointUser.ID)}>
+            Legg til manskap
+          </button>
+        </li>
+      );
+    }
+    let listUsedUsers = [];
+    for (let usedUser of this.usedUsers) {
+      listUsedUsers.push(
+        <li key={usedUser.ID}>
+          <Link to={"/eventDetails/" + usedUser.ID + ""}>
+            {usedUser.firstName} {usedUser.lastname}
+          </Link>
+          <div>Points: {usedUser.points}</div>
+          <div>Aktuelle roller: {usedUser.rolleList}</div>
+          <div>Status: {usedUser.confirmation}</div>
+          <button onClick={() => this.removeUserFromEvent(usedUser.ID)}>
+            Fjern bruker fra manskap
+          </button>
         </li>
       );
     }
@@ -1200,7 +1343,9 @@ class EventPersonnel extends React.Component {
           <ul>{listLeastPointUsers}</ul>
         </div>
         <div>
-          <button ref="choosePersonnelButton">Velg manskap</button>
+          <h2>Registrete brukere for dette arrangementet</h2>
+          <h4>Liste over medlemmer som er registret for dette arrangementet</h4>
+          <ul>{listUsedUsers}</ul>
         </div>
       </div>
     );
@@ -1211,20 +1356,21 @@ class EventPersonnel extends React.Component {
       this.props.location.pathname.substring(17),
       arrangement => {
         this.event = arrangement;
-        console.log(this.props.location.pathname);
         this.refs.backToAdminEventsButton.onclick = () => {
           history.replace("/adminEvents/");
         };
         this.refs.backToEventButton.onclick = () => {
-          history.replace("/eventDetails/:" + this.event.id);
+          history.replace("/eventDetails/:" + this.event.ID);
         };
-        this.refs.choosePersonnelButton.onclick = () => {};
-        console.log(this.event.id);
-        userService.getInterestedUsers(this.event.id, result => {
-          this.pointUsers = result;
-          userService.getPointsUsers(nResult => {
-            this.leastPointUsers = nResult;
-            this.forceUpdate();
+        userService.getUsersInEvent(this.event.ID, users => {
+          this.usedUsers = users;
+          userService.getInterestedUsers(this.event.ID, users => {
+            this.pointUsers = users;
+            userService.getPointsUsers(users => {
+              this.leastPointUsers = users;
+              this.updateLists();
+              this.forceUpdate();
+            });
           });
         });
       }
@@ -1290,7 +1436,7 @@ class ChangeEvent extends React.Component {
         this.event = arrangement;
         this.refs.changeEventButton.onclick = () => {
           userService.changeEvent(
-            this.event.id,
+            this.event.ID,
             this.refs.nEventname.value,
             this.refs.nDescription.value,
             this.refs.nMeetingpoint.value,
@@ -1357,7 +1503,7 @@ class Events extends React.Component {
     for (let event of this.events) {
       listEvents.push(
         <li id="eventList" className="list-group-item" key={event.ID}>
-          <Link to={"/userEventDetails/" + event.ID + ""}>
+          <Link to={"/userEventDetails/:" + event.ID + ""}>
             {event.Arrangement_Name}
           </Link>
           <div>{event.Description}</div>
@@ -1439,7 +1585,7 @@ class UserEventDetails extends React.Component {
     var user = userService.getSignedInUser();
     this.user = user;
     userService.getEvent(
-      this.props.location.pathname.substring(18),
+      this.props.location.pathname.substring(19),
       arrangement => {
         this.event = arrangement;
         this.refs.backToEventsButton.onclick = () => {
@@ -1449,13 +1595,13 @@ class UserEventDetails extends React.Component {
           history.replace("/profile/:" + user.email + "");
         };
         userService.getEventInterest(
-          this.event.id.toString(),
-          this.user.id.toString(),
+          this.event.ID.toString(),
+          this.user.ID.toString(),
           () => {
             if (
               userService.isUserInterested(
-                this.event.id.toString(),
-                this.user.id.toString()
+                this.event.ID.toString(),
+                this.user.ID.toString()
               )
             ) {
               document.getElementById("interestInEvent").textContent =
@@ -1463,8 +1609,8 @@ class UserEventDetails extends React.Component {
             } else {
               this.refs.interestInEventButton.onclick = () => {
                 userService.eventInterest(
-                  this.event.id.toString(),
-                  this.user.id.toString(),
+                  this.event.ID.toString(),
+                  this.user.ID.toString(),
                   result => {
                     document.getElementById("interestInEvent").textContent =
                       "Du har meldt interesse for denne vakten.";
@@ -2024,7 +2170,7 @@ ReactDOM.render(
         <Route exact path="/eventConfirmation/" component={EventConfirmation} />
         <Route exact path="/contactAdmin/" component={ContactAdmin} />
         <Route exact path="/emailConfirmation/" component={EmailConfirmation} />
-        <Route exact path="/mainScreen" component={mainScreen} />
+        <Route exact path="/mainScreen" component={MainScreen} />
       </Switch>
     </div>
   </HashRouter>,

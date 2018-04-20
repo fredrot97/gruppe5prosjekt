@@ -40,7 +40,7 @@ class User {
     points,
     status
   ) {
-    this.id = id;
+    this.ID = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.address = address;
@@ -49,6 +49,33 @@ class User {
     this.password = password;
     this.points = points;
     this.status = status;
+    this.isAdmin = false;
+  }
+}
+
+class EventUser {
+  constructor(
+    id,
+    firstName,
+    lastName,
+    address,
+    email,
+    phonenumber,
+    password,
+    points,
+    status,
+    confirmation
+  ) {
+    this.ID = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.address = address;
+    this.email = email;
+    this.phonenumber = phonenumber;
+    this.password = password;
+    this.points = points;
+    this.status = status;
+    this.confirmation = confirmation;
     this.isAdmin = false;
   }
 }
@@ -67,7 +94,7 @@ class Event {
     Equipmentlist,
     Map_Link
   ) {
-    this.id = id;
+    this.ID = id;
     this.arrangement_Name = Arrangement_Name;
     this.description = Description;
     this.meetingpoint = Meetingpoint;
@@ -299,6 +326,7 @@ class UserService {
       callback();
     });
   }
+  //deactivateUser deaktiverer en bruker
   deactivateUser(id, callback) {
     connection.query(
       "UPDATE Users SET status=? WHERE id=?",
@@ -374,26 +402,169 @@ class UserService {
       }
     );
   }
+  //getInterestedUsers henter brukere som har meldt interesse i et arrangement
   getInterestedUsers(event_id, callback) {
     connection.query(
       "SELECT * FROM Event_Interested INNER JOIN Users ON Event_Interested.User_ID=Users.ID WHERE Arrangement_ID=? ORDER BY Points DESC;",
       [event_id],
       (error, result) => {
-        console.log(event_id);
+        var users = [];
         if (error) throw error;
-
-        callback(result);
+        for (var i = 0; i < result.length; i++) {
+          users.push(
+            new User(
+              result[i].ID,
+              result[i].firstName,
+              result[i].lastName,
+              result[i].address,
+              result[i].email,
+              result[i].phonenumber,
+              result[i].password,
+              result[i].points,
+              result[i].status
+            )
+          );
+        }
+        callback(users);
       }
     );
   }
+  //getPointsUsers henter de brukeren med minst vaktpoeng, slik at adminer kan
+  //se hvem som har minst på lite attraktive arrangementer
   getPointsUsers(callback) {
     connection.query(
-      "SELECT * FROM Users WHERE status=? ORDER BY Points ASC",
+      "SELECT * FROM Users WHERE status=? ORDER BY Points ASC LIMIT 7",
       ["active"],
-      (error, nResult) => {
+      (error, result) => {
         if (error) throw error;
+        var users = [];
+        for (var i = 0; i < result.length; i++) {
+          users.push(
+            new User(
+              result[i].ID,
+              result[i].firstName,
+              result[i].lastName,
+              result[i].address,
+              result[i].email,
+              result[i].phonenumber,
+              result[i].password,
+              result[i].points,
+              result[i].status
+            )
+          );
+        }
+        callback(users);
+      }
+    );
+  }
+  //getUsersInEvent henter brukere som er meldt opp til et arrangement
+  getUsersInEvent(event_id, callback) {
+    connection.query(
+      "SELECT * FROM Event_Personnel INNER JOIN Users ON Event_Personnel.User_ID=Users.ID WHERE Arrangement_ID=?",
+      [event_id],
+      (error, result) => {
+        if (error) throw error;
+        var users = [];
+        for (var i = 0; i < result.length; i++) {
+          users.push(
+            new EventUser(
+              result[i].ID,
+              result[i].firstName,
+              result[i].lastName,
+              result[i].address,
+              result[i].email,
+              result[i].phonenumber,
+              result[i].password,
+              result[i].points,
+              result[i].status,
+              result[i].Confirmation
+            )
+          );
+        }
+        callback(users);
+      }
+    );
+  }
+  //makeUserIntoEventUser bekrefter at en bruker er en del av et arrangement
+  //og kan godta eller avslå stilling
+  makeUserIntoEventUser(user) {
+    return new EventUser(
+      user.ID,
+      user.firstName,
+      user.lastName,
+      user.address,
+      user.email,
+      user.phonenumber,
+      user.password,
+      user.points,
+      user.status,
+      "pending"
+    );
+  }
 
-        callback(nResult);
+  //getPotentialEventCallout og doesPotentialExist henter informasjon om
+  //potentielle vakter brukeren har
+  getPotentialEventCallout(user_id, callback) {
+    let eExists = false;
+    connection.query(
+      "SELECT * FROM Event_Personnel WHERE user_ID=?",
+      [user_id],
+      (error, result) => {
+        if (error) throw error;
+        if (result.length == 1) {
+          localStorage.setItem("eExists", "true");
+        } else {
+          localStorage.setItem("eExists", "false");
+        }
+        callback();
+      }
+    );
+  }
+  doesPotentialExist() {
+    return localStorage.getItem("eExists") == "true";
+  }
+  //completeEvent fullfører et arrangement og gir vakt poeng til de medlemene
+  //som deltok på arrangementet
+  completeEvent(event_id, callback) {
+    connection.query(
+      "DELETE FROM Events where id=? SELECT User_ID FROM Event_Personnel WHERE arrangement_id=? DELETE FROM Event_Personnel where arrangement_id=?"
+    );
+  }
+
+  confirmUserForEvent(user_ID, event_ID, callback) {
+    connection.query(
+      "UPDATE Event_Personnel SET Confirmation=? WHERE User_ID=? AND Arrangement_ID = ?",
+      ["confirmed", user_ID, event_ID],
+      (error, result) => {
+        if (error) throw error;
+        callback();
+      }
+    );
+  }
+  //denyUserForEvent avslår en søknad om stilling i et arrangement
+  denyUserForEvent(user_ID, event_ID, callback) {
+    connection.query(
+      "UPDATE Event_Personnel SET Confirmation=? WHERE User_ID=? AND Arrangement_ID = ?",
+      ["denied", user_ID, event_ID],
+      (error, result) => {
+        if (error) throw error;
+        callback();
+      }
+    );
+  }
+  //getRelevantEvents finner de relevante arrangementene som brukeren har som
+  //ikke er besvart, altså "pending"
+  getRelevantEvents(user_id, callback) {
+    connection.query(
+      "SELECT Arrangement_ID FROM Event_Personnel WHERE User_ID=? AND Confirmation=?",
+      [user_id, "pending"],
+      (error, result) => {
+        if (error) throw error;
+        var results = [];
+        for (let event_ID of result) {
+          results.push(event_ID.Arrangement_ID);
+        }
+        callback(results);
       }
     );
   }
@@ -403,6 +574,7 @@ class UserService {
       "SELECT * FROM Users WHERE email=? AND password=?",
       [inputEmail, inputPassword],
       (error, result) => {
+        if (error) throw error;
         let user = new User(
           "No Result",
           "No Result",
@@ -450,9 +622,9 @@ class UserService {
   getSignedInUser() {
     return JSON.parse(localStorage.getItem("user"));
   }
-  //checkEmail sjekker om innskrevet email i "opprett bruker" funksjonaliteten allerede ekisterer i databasen
+  //checkEmail og isEmailTaken sjekker om innskrevet email i "opprett bruker"
+  //funksjonaliteten allerede ekisterer i databasen
   checkEmail(nEmail1, callback) {
-    console.log("Checking Email at Services side");
     let exists = false;
     connection.query(
       "SELECT * FROM Users WHERE email=?",
@@ -470,6 +642,8 @@ class UserService {
   isEmailTaken() {
     return localStorage.getItem("pExists") == "true";
   }
+  //checkPhonenumber og isPhonenumberTaken sjekker om et telefonnummer er
+  //allerede i bruk
   checkPhonenumber(nPhonenumber, callback) {
     let exists = false;
     connection.query(
@@ -486,12 +660,13 @@ class UserService {
     );
   }
   isPhonenumberTaken() {
-    console.log("It's working.");
     return localStorage.getItem("pExists") == "true";
   }
+  //userLogOut logger brukeren ut av appen
   userLogOut() {
     localStorage.setItem("user", "");
   }
+  //changeUserProfile forandrer informasjon om en bruker
   changeUserProfile(
     changeFirstName,
     changeLastName,
@@ -566,7 +741,7 @@ class UserService {
     });
     callback();
   }
-
+  //getCompetence henter kompetansen til en bruker
   getCompetence(id, callback) {
     connection.query(
       "SELECT * FROM User_Competence WHERE User_ID=?",
@@ -577,7 +752,7 @@ class UserService {
       }
     );
   }
-
+  //changeEvent forandrer detaljene på et arrangement
   changeEvent(
     id,
     nEventname,
@@ -697,6 +872,29 @@ class UserService {
       }
     );
   }
+  //addUserToEvent legger en bruker til et arrangement
+  addUserToEvent(user_id, event_id, callback) {
+    connection.query(
+      "INSERT INTO Event_Personnel (User_ID, Arrangement_ID, Role_ID, Callout_time, Confirmation) values (?, ?, ?, ?, ?)",
+      [user_id, event_id, 0, 0, "pending"],
+      (error, result) => {
+        if (error) throw error;
+        callback();
+      }
+    );
+  }
+
+  removeUserFromEvent(user_id, event_id, callback) {
+    connection.query(
+      "DELETE FROM Event_Personnel WHERE Arrangement_ID = ? AND User_ID = ?",
+      [event_id, user_id],
+      (error, result) => {
+        if (error) throw error;
+        callback();
+      }
+    );
+  }
+
   //getEventInterest sjekker om en bruker allerede er interessert i et
   //arrangement
   getEventInterest(event_id, user_id, callback) {
@@ -715,6 +913,8 @@ class UserService {
       }
     );
   }
+  //isUserInterested sjekker om brukeren er interessert i et arrangementer i
+  //det den går inn på et spesifikt arrangement
   isUserInterested() {
     return localStorage.getItem("iExists") == "true";
   }
@@ -756,6 +956,7 @@ class UserService {
       }
     );
   }
+  //henteRolle
   hentRolle(id, callback) {
     let muligRolle = [];
     let kvaliArray = [];
