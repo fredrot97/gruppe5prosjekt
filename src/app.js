@@ -750,31 +750,13 @@ class UserProfileAdmin extends React.Component {
       <div className="UserProfileAdminCSS" align="center">
         <div>
           <div>
-            <button
-              type="button"
-              id="logOutLinkCSS"
-              className="btn btn-link"
-              ref="adminLogoutButton"
-            >
-              Logg ut
-            </button>
+            <button type="button" id="logOutLinkCSS" className="btn btn-link" ref="adminLogoutButton">Logg ut</button>
           </div>
 
-          <img
-            src="img/admin2.png"
-            className="adminLogo"
-            alt="Logo for administrator"
-          />
+          <img src="img/admin2.png" className="adminLogo" alt="Logo for administrator"/>
           <h2>Administrator</h2>
           <div>
-            <button
-              type="button"
-              className="btn btn-default"
-              id="buttonMainScreenAdmin"
-              ref="adminEventButton"
-            >
-              Arrangementer
-            </button>
+            <button type="button" className="btn btn-default" id="buttonMainScreenAdmin" ref="adminEventButton">Arrangementer</button>
           </div>
         </div>
         <div>
@@ -1093,22 +1075,6 @@ class NewProfileAdminAccess extends React.Component {
   }
 
   render() {
-    let rolleList = [];
-    for (let rolle of this.rolle) {
-      rolleList.push(
-        <li className="liCSS" key={rolle}>
-          {rolle}
-        </li>
-      );
-    }
-    let kvaliList = [];
-    for (let kvali of this.kvali) {
-      kvaliList.push(
-        <li className="liCSS" key={kvali.Competence_Name}>
-          {kvali.Competence_Name}
-        </li>
-      );
-    }
     return (
       <div className="newProfileAdminAccessCSS" align="center">
         <div>
@@ -1138,10 +1104,6 @@ class NewProfileAdminAccess extends React.Component {
           <p>{this.user.phonenumber}</p>
 
           <p>{this.user.email}</p>
-
-          <p>Kompetanse: {kvaliList}</p>
-
-          <p>Mulige roller: {rolleList}</p>
 
           <button type="button" className="btn btn-success" ref="acceptButton">
             Godta bruker
@@ -1173,14 +1135,6 @@ class NewProfileAdminAccess extends React.Component {
         history.replace("/newUsersDisplay/");
       });
     };
-    userService.getCompetence(this.id, result => {
-      this.kvali = result;
-      this.forceUpdate();
-    });
-    userService.hentRolle(this.id, result => {
-      this.rolle = result;
-      this.forceUpdate();
-    });
   }
 }
 
@@ -2024,37 +1978,30 @@ class CreateEvent extends React.Component {
         <div>
           <h3>Opprett arrangement</h3>
 
-          <input type="text" placeholder="Arrangementnavn" ref="nEventname" />
-          <div id="EventnameError" />
-          <textarea
-            placeholder="Beskrivelse"
-            ref="nDescription"
-            rows="4"
-            cols="19"
-          />
+            <input type="text" placeholder="Arrangementnavn"ref="nEventname" />
+            <div id="EventnameError" />
+            <p id="pBold">Tid:</p>
+            <input type="date" ref="nDate" />
+            <div id="DateError" />
+              <input type="time" ref="nStartTime" />
+              <div id="StartTimeError" />
+              <input type="time" ref="nEndTime" />
+              <div id="EndTimeError" />
+              <p id="pBold">Beskrivelse</p>
+            <textarea  ref="nDescription" rows="4" cols="19" />
           <div id="DescriptionError" />
         </div>
         <p id="pBold">Møtepunkt</p>
         <input type="text" placeholder="Adresse" ref="nMeetingpoint" />
         <div id="MeetingpointError" />
-        <input type="text" placeholder="Kartlenke" ref="nMap" />
+        <input type="text" placeholder="Kartlenke"ref="nMap" />
         <div id="MapError" />
         <p id="pBold">Kontaktperson:</p>
-        <input type="text" placeholder="Navn" ref="nContactperson" />
+        <input type="text" placeholder="Navn"ref="nContactperson" />
         <div id="ContactpersonError" />
-        <input
-          type="text"
-          placeholder="Telefonnummer"
-          ref="nPhonenumberContactperson"
-        />
+        <input type="text" placeholder="Telefonnummer"ref="nPhonenumberContactperson" />
         <div id="PhonenumberContactpersonError" />
-        <p id="pBold">Tid:</p>
-        <input type="date" ref="nDate" />
-        <div id="DateError" />
-        <input type="time" ref="nStartTime" />
-        <div id="StartTimeError" />
-        <input type="time" ref="nEndTime" />
-        <div id="EndTimeError" />
+
         <p>Utstyrsliste:</p>
         <input type="text" ref="nEquipmentlist" />
         <div id="EquipmentlistError" />
