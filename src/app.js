@@ -241,7 +241,9 @@ class UserProfile extends React.Component {
     for (let event_ID of this.events) {
       eventList.push(
         <li key={event_ID}>
-          <Link to={"/userEventDetails/:" + event_ID + ""}>{event_ID}</Link>
+          <Link to={"/userEventDetails/:" + event_ID + ""}>
+            {arrangement_Name}
+          </Link>
           <button onClick={() => this.confirmUserForEvent(event_ID)}>
             Bekreft deltagelse
           </button>
@@ -327,11 +329,11 @@ class UserProfile extends React.Component {
         });
       }
     };
-    userService.getCompetence(this.id, result => {
+    userService.getCompetence(this.user.ID, result => {
       this.kvali = result;
       this.forceUpdate();
     });
-    userService.hentRolle(this.id, result => {
+    userService.hentRolle(this.user.ID, result => {
       this.rolle = result;
       this.forceUpdate();
     });
@@ -548,12 +550,11 @@ class ChangeProfile extends React.Component {
         this.refs.changeFirstName.value,
         this.refs.changeLastName.value,
         this.refs.changeAddress.value,
-        this.refs.changePhonenumber.value,
         this.user.email,
         this.user.password,
         this.refs.addCompetence.value,
         this.refs.Validity_From.value,
-        this.id,
+        this.user.ID,
         user => {
           history.replace("/changeProfileSuccess/");
         }

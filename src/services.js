@@ -710,7 +710,6 @@ class UserService {
     changeFirstName,
     changeLastName,
     changeAddress,
-    changePhonenumber,
     email,
     password,
     addCompetence,
@@ -754,8 +753,11 @@ class UserService {
         }
       );
     }
+    console.log(id);
+    console.log(addCompetence);
+    console.log(Validity_From);
     connection.query(
-      "INSERT INTO User_Competence SET User_ID=?, Competence_Name=?, Validity_From=?",
+      "INSERT INTO User_Competence (User_ID, Competence_Name, Validity_From) VALUES (?, ?, ?)",
       [id, addCompetence, Validity_From],
       (error, result) => {
         if (error) throw error;
