@@ -190,6 +190,30 @@ class UserService {
       callback();
     });
   }
+
+  deleteEventInterested(id, callback) {
+    connection.query(
+      "DELETE FROM Event_Interested WHERE Arrangement_ID=?",
+      [id],
+      (error, result) => {
+        if (error) throw error;
+
+        callback();
+      }
+    );
+  }
+
+  deleteEventPersonnel(id, callback) {
+    connection.query(
+      "DELETE FROM Event_Personnel WHERE Arrangement_ID=?",
+      [id],
+      (error, result) => {
+        if (error) throw error;
+
+        callback();
+      }
+    );
+  }
   //getUsers henter all informasjon om alle brukere
   getUsers(callback) {
     connection.query("SELECT * FROM Users", (error, result) => {
@@ -523,14 +547,29 @@ class UserService {
   doesPotentialExist() {
     return localStorage.getItem("eExists") == "true";
   }
-  //completeEvent fullfører et arrangement og gir vakt poeng til de medlemene
-  //som deltok på arrangementet
-  completeEvent(event_id, callback) {
+  //getConfirmedUsers
+  getConfirmedUsers(event_id, callback) {
     connection.query(
-      "DELETE FROM Events where id=? SELECT User_ID FROM Event_Personnel WHERE arrangement_id=? DELETE FROM Event_Personnel where arrangement_id=?"
+      "SELECT User_ID FROM Event_Personnel WHERE arrangement_ID=? AND Confirmation=?",
+      [event_id, "confirmed"],
+      (error, result) => {
+        if (error) throw error;
+
+        callback(result);
+      }
     );
   }
+  updatePoints(user_id, callback) {
+    connection.query(
+      "UPDATE Users SET points=points+1 WHERE id=?",
+      [user_id],
+      (error, result) => {
+        if (error) throw error;
 
+        callback();
+      }
+    );
+  }
   confirmUserForEvent(user_ID, event_ID, callback) {
     connection.query(
       "UPDATE Event_Personnel SET Confirmation=? WHERE User_ID=? AND Arrangement_ID = ?",
@@ -712,18 +751,6 @@ class UserService {
           let NewAddress = JSON.parse(localStorage.getItem("user"));
           NewAddress.address = changeAddress;
           localStorage.setItem("user", JSON.stringify(NewAddress));
-        }
-      );
-    }
-    if (changePhonenumber != "" && !isNaN(changePhonenumber)) {
-      connection.query(
-        "UPDATE Users SET phonenumber=? WHERE email=?",
-        [changePhonenumber, email],
-        (error, result) => {
-          if (error) throw error;
-          let NewPhonenumber = JSON.parse(localStorage.getItem("user"));
-          NewPhonenumber.phonenumber = changePhonenumber;
-          localStorage.setItem("user", JSON.stringify(NewPhonenumber));
         }
       );
     }
