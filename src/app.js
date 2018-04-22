@@ -229,12 +229,12 @@ class UserProfile extends React.Component {
     this.ID = user.ID;
     let rolleList = [];
     for (let rolle of this.rolle) {
-      rolleList.push(<li key={rolle}>{rolle}</li>);
+      rolleList.push(<li className="liCSS2" key={rolle}>{rolle}</li>);
     }
     let kvaliList = [];
     for (let kvali of this.kvali) {
       kvaliList.push(
-        <li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
+        <li className="liCSS2" key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
       );
     }
     let eventList = [];
@@ -301,7 +301,7 @@ class UserProfile extends React.Component {
             </button>
 
             <p>Vaktpoeng: {this.user.points}</p>
-            <button ref="changeProfileDetailsButton">Endre detaljer</button>
+            <button type="button" className="btn btn-basic" ref="changeProfileDetailsButton">Endre detaljer</button>
           </div>
         </div>
       </div>
@@ -2204,7 +2204,7 @@ class ForgottenPassword extends React.Component {
             type="button"
             id="contactAdminButton"
             className="btn btn-primary"
-            ref="sendEmail"
+            ref="sendEmail2"
           >
             Send
           </button>
@@ -2216,7 +2216,7 @@ class ForgottenPassword extends React.Component {
     this.refs.backToLoginButton.onclick = () => {
       history.replace("/");
     };
-    this.refs.sendEmail.onclick = () => {
+    this.refs.sendEmail2.onclick = () => {
       let transporter = nodeMailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -2243,7 +2243,40 @@ class ForgottenPassword extends React.Component {
           return console.log(error);
         }
       });
-      history.replace("/emailConfirmation/");
+      history.replace("/emailConfirmation2/");
+    };
+  }
+}
+
+class EmailConfirmation2 extends React.Component {
+  constructor() {
+    super();
+
+    this.users = [];
+  }
+
+  render() {
+    return (
+      <div className="EmailConfirmationCSS" align="center">
+        <div>
+          <button
+            type="button"
+            className="btn btn-link"
+            ref="backToLoginButton"
+          >
+            Tilbake til login
+          </button>
+        </div>
+        <div>
+          <h3>Meldingen din har blitt sendt!</h3>
+          <p>Du vil motta et svar så fort som mulig.</p>
+        </div>
+      </div>
+    );
+  }
+  componentDidMount() {
+    this.refs.backToLoginButton.onclick = () => {
+      history.replace("/");
     };
   }
 }
@@ -2577,6 +2610,11 @@ ReactDOM.render(
           exact="exact"
           path="/emailConfirmation/"
           component={EmailConfirmation}
+        />
+        <Route
+          exact="exact"
+          path="/emailConfirmation2/"
+          component={EmailConfirmation2}
         />
         <Route exact="exact" path="/mainScreen" component={MainScreen} />
       </Switch>

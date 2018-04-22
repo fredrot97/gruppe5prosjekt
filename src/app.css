@@ -154,6 +154,10 @@ font-size: x-large;
   list-style: none;
 }
 
+.liCSS2 {
+  list-style-position: outside;
+}
+
 .rk2 {
   width: 50%;
   height: auto;
