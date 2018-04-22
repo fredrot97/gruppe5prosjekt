@@ -190,32 +190,6 @@ class UserService {
       callback();
     });
   }
-  //deleteEventInterested sletter alle som er interessert i et spesifikt
-  //arrangement
-  deleteEventInterested(id, callback) {
-    connection.query(
-      "DELETE FROM Event_Interested WHERE Arrangement_ID=?",
-      [id],
-      (error, result) => {
-        if (error) throw error;
-
-        callback();
-      }
-    );
-  }
-  //deleteEventPersonnel sletter alle brukere som er manskap i et spesifikt
-  //arrangement
-  deleteEventPersonnel(id, callback) {
-    connection.query(
-      "DELETE FROM Event_Personnel WHERE Arrangement_ID=?",
-      [id],
-      (error, result) => {
-        if (error) throw error;
-
-        callback();
-      }
-    );
-  }
   //getUsers henter all informasjon om alle brukere
   getUsers(callback) {
     connection.query("SELECT * FROM Users", (error, result) => {
@@ -549,32 +523,14 @@ class UserService {
   doesPotentialExist() {
     return localStorage.getItem("eExists") == "true";
   }
-  //getConfirmedUsers henter ut de brukeren som har akseptert den spesifikke
-  //vakten
-  getConfirmedUsers(event_id, callback) {
+  //completeEvent fullfører et arrangement og gir vakt poeng til de medlemene
+  //som deltok på arrangementet
+  completeEvent(event_id, callback) {
     connection.query(
-      "SELECT User_ID FROM Event_Personnel WHERE arrangement_ID=? AND Confirmation=?",
-      [event_id, "confirmed"],
-      (error, result) => {
-        if (error) throw error;
-
-        callback(result);
-      }
+      "DELETE FROM Events where id=? SELECT User_ID FROM Event_Personnel WHERE arrangement_id=? DELETE FROM Event_Personnel where arrangement_id=?"
     );
   }
-  //updatePoints oppdaterer poengsummen for brukere som har vært med på et
-  //arrangement ved å legge til et poeng til deres vaktpoengsum
-  updatePoints(user_id, callback) {
-    connection.query(
-      "UPDATE Users SET points=points+1 WHERE id=?",
-      [user_id],
-      (error, result) => {
-        if (error) throw error;
 
-        callback();
-      }
-    );
-  }
   confirmUserForEvent(user_ID, event_ID, callback) {
     connection.query(
       "UPDATE Event_Personnel SET Confirmation=? WHERE User_ID=? AND Arrangement_ID = ?",
@@ -759,6 +715,18 @@ class UserService {
         }
       );
     }
+    if (changePhonenumber != "" && !isNaN(changePhonenumber)) {
+      connection.query(
+        "UPDATE Users SET phonenumber=? WHERE email=?",
+        [changePhonenumber, email],
+        (error, result) => {
+          if (error) throw error;
+          let NewPhonenumber = JSON.parse(localStorage.getItem("user"));
+          NewPhonenumber.phonenumber = changePhonenumber;
+          localStorage.setItem("user", JSON.stringify(NewPhonenumber));
+        }
+      );
+    }
     connection.query(
       "INSERT INTO User_Competence SET User_ID=?, Competence_Name=?, Validity_From=?",
       [id, addCompetence, Validity_From],
@@ -915,8 +883,7 @@ class UserService {
       }
     );
   }
-  //removeUserFromEvent fjerner et bruker fra listen over manskap til et
-  //arrangement
+
   removeUserFromEvent(user_id, event_id, callback) {
     connection.query(
       "DELETE FROM Event_Personnel WHERE Arrangement_ID = ? AND User_ID = ?",
@@ -979,7 +946,17 @@ class UserService {
       }
     );
   }
-  //henteRolle henter ut rollene til en spesifikk bruker
+  //newPassword setter et nytt passord for en spesifikk bruker
+  newPassword(passwordEmail, callback) {
+    connection.query(
+      "SELECT * FROM Users WHERE email=? SET password =",
+      [passwordEmail],
+      (error, result) => {
+        if (error) throw error;
+      }
+    );
+  }
+  //henteRolle
   hentRolle(id, callback) {
     let muligRolle = [];
     let kvaliArray = [];

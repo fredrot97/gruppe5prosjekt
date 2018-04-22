@@ -21,16 +21,8 @@
 }
 
 .userEventDetailsCSS {
-  position: fixed;
-  background-color: white;
   margin: auto;
-  top: 50%;
-  left: 50%;
-  text-align: center;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  width: 40%;
-  text
+  width: 70%;
 }
 
 .userProfileCSS {
@@ -42,7 +34,17 @@
   text-align: center;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  width: 50%;
+}
+
+.userConfirmationCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 .UserProfileAdminCSS {
@@ -90,17 +92,6 @@
 }
 
 .contactAdminCSS {
-  position: fixed;
-  background-color: white;
-  margin: auto;
-  top: 50%;
-  left: 50%;
-  text-align: center;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
-.eventsCSS {
   position: fixed;
   background-color: white;
   margin: auto;
@@ -174,7 +165,7 @@ font-size: x-large;
 }
 
 .profilePicture {
-  width: 18%;
+  width: 13%;
   height: auto;
 }
 
@@ -217,6 +208,7 @@ font-size: x-large;
 
 #nameCSS {
   font-weight: bold;
+  margin-top: -2%;
 }
 
 #buttonsMainScreen {
@@ -239,6 +231,7 @@ margin-top: 3%;
 
 #loginButton {
   margin-top: 5%;
+  margin-bottom: 1%;
 }
 
 #forgottenPasswordButton {
@@ -251,6 +244,10 @@ margin-top: 3%;
 
 #contactAdminButton {
   margin-top: 2%;
+}
+
+#blimedlemCSS {
+  margin-top: 4%;
 }
 
 ::-webkit-input-placeholder {
