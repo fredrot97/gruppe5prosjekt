@@ -20,7 +20,32 @@
   transform: translate(-50%, -50%);
 }
 
+.userEventDetailsCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 40%;
+  text
+}
+
 .userProfileCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 50%;
+}
+
+.UserProfileAdminCSS {
   position: fixed;
   background-color: white;
   margin: auto;
@@ -31,6 +56,28 @@
   transform: translate(-50%, -50%);
 }
 
+.changeprofileCss {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+    width: 50%;
+}
+
+.changeProfileSuccessCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
 .forgottenPasswordCSS {
   position: fixed;
   background-color: white;
@@ -97,18 +144,79 @@
   transform: translate(-50%, -50%);
 }
 
+.profileAccessCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.brukerhåndteringCSS {
+font-size: x-large;
+}
+
+.liCSS {
+  list-style: none;
+}
+
 .rk2 {
   width: 50%;
   height: auto;
 }
 
-.form-control {
+.adminLogo{
+  width: 30%;
+  height: auto;
+}
+
+.profilePicture {
+  width: 18%;
+  height: auto;
 }
 
 .mainScreenLogo {
   width: 25%;
   height: auto;
   margin-top: 2%;
+}
+
+.spacingDiv {
+  margin-top: 4%;
+}
+
+.spacingDiv2 {
+  margin-top: 2%;
+}
+
+.spacingDiv3 {
+  margin-top: -3%;
+}
+
+
+
+#usersHeader {
+  margin-top: 3%;
+}
+
+#buttonMainScreenAdmin {
+  font-size: 18px;
+  margin-bottom: 3.5%;
+}
+
+#otherUsersList {
+  list-style: none;
+}
+
+#pBold {
+  font-weight: bold;
+}
+
+#nameCSS {
+  font-weight: bold;
 }
 
 #buttonsMainScreen {
@@ -119,7 +227,7 @@ margin-top: 3%;
 }
 
 #buttonsMainScreen:hover {
-  background-color: #747474;
+  background-color: #000289;
   color: white;
   transition: 0.3s;
   box-shadow: 0 27px 24px 0 rgba(0,0,0,0.24), 0 20px 50px 0 rgba(0,0,0,0.19);
@@ -157,5 +265,9 @@ margin-top: 3%;
 
 #eventList {
   list-style-type: none;
-margin-right: 30%;
+border: black;
+}
+
+#vaktpoengDiv {
+  margin-bottom: 3%;
 }
