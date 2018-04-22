@@ -595,15 +595,11 @@ class UserService {
   //ikke er besvart, altså "pending"
   getRelevantEvents(user_id, callback) {
     connection.query(
-      "SELECT Arrangement_ID FROM Event_Personnel WHERE User_ID=? AND Confirmation=?",
+      "SELECT * FROM Event_Personnel INNER JOIN Events ON Event_Personnel.Arrangement_ID=Events.ID WHERE User_ID=? AND Confirmation=?",
       [user_id, "pending"],
       (error, result) => {
         if (error) throw error;
-        var results = [];
-        for (let event_ID of result) {
-          results.push(event_ID.Arrangement_ID);
-        }
-        callback(results);
+        callback(result);
       }
     );
   }

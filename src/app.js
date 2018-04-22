@@ -238,14 +238,14 @@ class UserProfile extends React.Component {
       );
     }
     let eventList = [];
-    for (let event_ID of this.events) {
+    for (let event of this.events) {
       eventList.push(
-        <li key={event_ID}>
-          <Link to={"/userEventDetails/:" + event_ID + ""}>{event_ID}</Link>
-          <button onClick={() => this.confirmUserForEvent(event_ID)}>
+        <li key={event.ID}>
+          <Link to={"/userEventDetails/:" + event.ID + ""}>{event.Arrangement_Name}</Link>
+          <button onClick={() => this.confirmUserForEvent(event.ID)}>
             Bekreft deltagelse
           </button>
-          <button onClick={() => this.denyUserForEvent(event_ID)}>
+          <button onClick={() => this.denyUserForEvent(event.ID)}>
             Avkreft deltagelse
           </button>
         </li>
@@ -474,6 +474,8 @@ class ChangeProfile extends React.Component {
           <input type="text" ref="changeLastName" />
           <h2>Addresse: {this.user.address}</h2>
           <input type="text" ref="changeAddress" />
+          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+          <input type="text" ref="changePhonenumber" />
           <h2>Kompetanse: </h2>
           <select ref="addCompetence">
             <option value="">Ingen</option>
@@ -524,7 +526,7 @@ class ChangeProfile extends React.Component {
             </optgroup>
           </select>
           <div>
-            <label for="gyldighet">Gyldig fra:</label>
+            <p>Gyldig fra:</p>
           </div>
 
           <input id="gyldighet" type="date" ref="Validity_From" />
@@ -543,18 +545,7 @@ class ChangeProfile extends React.Component {
     var user = userService.getSignedInUser();
     this.user = user;
     this.ID = user.ID;
-    this.refs.changeUserDetailsButton.onclick = () =>
-      userService.changeUserProfile(
-        this.refs.changeFirstName.value,
-        this.refs.changeLastName.value,
-        this.refs.changeAddress.value,
-        this.refs.changePhonenumber.value,
-        this.user.email,
-        this.user.password,
-        this.refs.addCompetence.value,
-        this.refs.Validity_From.value,
-        this.id,
-        user => {
+    this.refs.changeUserDetailsButton.onclick = () => userService.changeUserProfile(this.refs.changeFirstName.value, this.refs.changeLastName.value, this.refs.changeAddress.value, this.refs.changePhonenumber.value, this.user.email, this.user.password, this.refs.addCompetence.value, this.refs.Validity_From.value, this.id, user => {
           history.replace("/changeProfileSuccess/");
         }
       );
@@ -693,20 +684,11 @@ class ProfileAccess extends React.Component {
               {this.user.firstName} {this.user.lastName}
             </p>
 
-            <p>{this.user.address}</p>
-
             <p>{this.user.email}</p>
 
             <p>{this.user.phonenumber}</p>
             <br />
 
-            <p>Epost: {this.user.email}</p>
-
-            <p>Kompetanse: {kvaliList}</p>
-
-            <p>Mulige roller: {rolleList}</p>
-
-            <p>Status: {this.user.status}</p>
           </div>
         </div>
       </div>
@@ -721,7 +703,6 @@ class ProfileAccess extends React.Component {
       }
     );
     this.id = this.props.location.pathname.substring(15);
-    console.log(this.id);
     userService.getSearchUser(
       this.props.location.pathname.substring(15),
       nUser => {
@@ -729,9 +710,6 @@ class ProfileAccess extends React.Component {
         this.forceUpdate();
       }
     );
-    this.refs.eventButton.onclick = () => {
-      history.replace("/events/");
-    };
     this.refs.otherUsersButton.onclick = () => {
       history.replace("/otherUsers/");
     };
@@ -869,7 +847,7 @@ class UsersDisplay extends React.Component {
             className="btn btn-warning"
             ref="newUserDisplayButton"
           >
-            Nye brukere
+            Brukerforespørsler
           </button>
           <button
             type="button"
@@ -938,7 +916,7 @@ class ProfileAdminAccess extends React.Component {
         <div>
           <button ref="adminEventButton">Arrangementer</button>
           <button ref="userDisplayButton">Brukere </button>
-          <button ref="newUserDisplayButton">Nye brukere</button>
+          <button ref="newUserDisplayButton">Brukerforespørsler</button>
           <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
         </div>
         <div>
@@ -1040,7 +1018,7 @@ class NewUsersDisplay extends React.Component {
             className="btn btn-warning"
             ref="newUserDisplayButton"
           >
-            Nye brukere
+            Brukerforespørsler
           </button>
           <button
             type="button"
@@ -1051,7 +1029,7 @@ class NewUsersDisplay extends React.Component {
           </button>
         </div>
         <div>
-          <h3 id="usersHeader">Nye medlemmer</h3>
+          <h3 id="usersHeader">Brukerforespørsler</h3>
           {listUsers}
         </div>
       </div>
@@ -1091,30 +1069,24 @@ class NewProfileAdminAccess extends React.Component {
   render() {
     let rolleList = [];
     for (let rolle of this.rolle) {
-      rolleList.push(<li key={rolle}>{rolle}</li>);
+      rolleList.push(<li className="liCSS" key={rolle}>{rolle}</li>);
     }
     let kvaliList = [];
     for (let kvali of this.kvali) {
-      kvaliList.push(
-        <li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
+      kvaliList.push(<li className="liCSS" key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
       );
     }
     return (
-      <div>
+      <div align="center">
         <div>
-          <button ref="adminEventButton">Arrangementer</button>
-          <button ref="userDisplayButton">Brukere </button>
-          <button ref="newUserDisplayButton">Nye brukere</button>
-          <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
+          <button type="button" className="btn btn-link" ref="newUserDisplayButton">Tilbake til brukerforespørsler</button>
         </div>
         <div>
-          <h2>Fornavn: {this.user.firstName}</h2>
+          <p id="pBold">Fornavn: {this.user.firstName} {this.user.lastName}</p>
 
-          <h2>Etternavn: {this.user.lastName}</h2>
+          <p>Addresse: {this.user.address}</p>
 
-          <h2>Addresse: {this.user.address}</h2>
-
-          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+          <p>Telefonnummer: {this.user.phonenumber}</p>
 
           <p>Epost: {this.user.email}</p>
 
@@ -1123,8 +1095,8 @@ class NewProfileAdminAccess extends React.Component {
           <p>Mulige roller: {rolleList}</p>
 
           <p>Status: {this.user.status}</p>
-          <button ref="acceptButton">Godta bruker</button>
-          <button ref="denyButton">Avslå bruker</button>
+          <button type="button" className="btn btn-success" ref="acceptButton">Godta bruker</button>
+          <button type="button" className="btn btn-danger" ref="denyButton">Avslå bruker</button>
         </div>
       </div>
     );
@@ -1135,17 +1107,8 @@ class NewProfileAdminAccess extends React.Component {
       this.user = nUser;
       this.forceUpdate();
     });
-    this.refs.adminEventButton.onclick = () => {
-      history.replace("/adminEvents/");
-    };
     this.refs.newUserDisplayButton.onclick = () => {
       history.replace("/newUsersDisplay/");
-    };
-    this.refs.userDisplayButton.onclick = () => {
-      history.replace("/usersDisplay/");
-    };
-    this.refs.deletedUserDisplayButton.onclick = () => {
-      history.replace("/deletedUsersDisplay/");
     };
 
     this.refs.acceptButton.onclick = () => {
@@ -1212,7 +1175,7 @@ class DeletedUsersDisplay extends React.Component {
             className="btn btn-warning"
             ref="newUserDisplayButton"
           >
-            Nye brukere
+            Brukerforespørsler
           </button>
           <button
             type="button"
@@ -1276,8 +1239,8 @@ class DeletedProfileAdminAccess extends React.Component {
         <div>
           <button ref="adminEventButton">Arrangementer</button>
           <button ref="userDisplayButton">Brukere </button>
-          <button ref="newUserDisplayButton">Nye brukere</button>
-          <button ref="deletedUserDisplayButton">Nye brukere</button>
+          <button ref="newUserDisplayButton">Brukerforespørsler</button>
+          <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
         </div>
         <div>
           <h2>Fornavn: {this.user.firstName}</h2>
@@ -1406,9 +1369,9 @@ class EventDetails extends React.Component {
   }
   render() {
     if (this.event.meetingdate === undefined) {
-      this.meetingdate = new Date().toString();
+      this.meetingdate = new Date().toDateString();
     } else {
-      this.meetingdate = this.event.meetingdate.toString();
+      this.meetingdate = this.event.meetingdate.toDateString();
     }
     return (
       <div align="center">
@@ -1725,9 +1688,9 @@ class ChangeEvent extends React.Component {
   }
   render() {
     if (this.event.meetingdate === undefined) {
-      this.meetingdate = new Date().toString();
+      this.meetingdate = new Date().toDateString();
     } else {
-      this.meetingdate = this.event.meetingdate.toString();
+      this.meetingdate = this.event.meetingdate.toDateString();
     }
     return (
       <div>
@@ -1891,9 +1854,9 @@ class UserEventDetails extends React.Component {
   }
   render() {
     if (this.event.meetingdate === undefined) {
-      this.meetingdate = new Date().toString();
+      this.meetingdate = new Date().toDateString();
     } else {
-      this.meetingdate = this.event.meetingdate.toString();
+      this.meetingdate = this.event.meetingdate.toDateString();
     }
     return (
       <div className="userEventDetailsCSS" align="center">
