@@ -903,40 +903,38 @@ class ProfileAdminAccess extends React.Component {
   render() {
     let rolleList = [];
     for (let rolle of this.rolle) {
-      rolleList.push(<li key={rolle}>{rolle}</li>);
+      rolleList.push(<li className="liCSS" key={rolle}>{rolle}</li>);
     }
     let kvaliList = [];
     for (let kvali of this.kvali) {
       kvaliList.push(
-        <li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
+        <li className="liCSS" key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
       );
     }
     return (
-      <div>
+      <div align="center">
         <div>
-          <button ref="adminEventButton">Arrangementer</button>
-          <button ref="userDisplayButton">Brukere </button>
-          <button ref="newUserDisplayButton">Brukerforespørsler</button>
-          <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
+          <button type="button" className="btn btn-link" ref="userDisplayButton">Tilbake til brukere</button>
         </div>
         <div>
-          <h2>Fornavn: {this.user.firstName}</h2>
+          <img
+            src="img/profile.png"
+            className="profilePicture"
+            alt="Profilbilde"
+          />
+          <p id="pBold">{this.user.firstName} {this.user.lastName}</p>
 
-          <h2>Etternavn: {this.user.lastName}</h2>
+            <p>{this.user.address}</p>
 
-          <h2>Addresse: {this.user.address}</h2>
+            <p>{this.user.phonenumber}</p>
 
-          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+            <p>{this.user.email}</p>
 
-          <p>Epost: {this.user.email}</p>
+            <p>Kompetanse: {kvaliList}</p>
 
-          <p>Kompetanse: {kvaliList}</p>
+            <p>Mulige roller: {rolleList}</p>
 
-          <p>Mulige roller: {rolleList}</p>
-
-          <p>Status: {this.user.status}</p>
-
-          <button ref="deactiveUserButton">Deaktiver bruker</button>
+          <button type="button" className="btn btn-danger" ref="deactiveUserButton">Deaktiver bruker</button>
         </div>
       </div>
     );
@@ -947,17 +945,8 @@ class ProfileAdminAccess extends React.Component {
       this.user = nUser;
       this.forceUpdate();
     });
-    this.refs.adminEventButton.onclick = () => {
-      history.replace("/adminEvents/");
-    };
-    this.refs.newUserDisplayButton.onclick = () => {
-      history.replace("/newUsersDisplay/");
-    };
     this.refs.userDisplayButton.onclick = () => {
       history.replace("/usersDisplay/");
-    };
-    this.refs.deletedUserDisplayButton.onclick = () => {
-      history.replace("/deletedUsersDisplay/");
     };
     this.refs.deactiveUserButton.onclick = () => {
       userService.deactivateUser(this.user.ID, () => {
@@ -1077,24 +1066,29 @@ class NewProfileAdminAccess extends React.Component {
       );
     }
     return (
-      <div align="center">
+      <div className="newProfileAdminAccessCSS" align="center">
         <div>
           <button type="button" className="btn btn-link" ref="newUserDisplayButton">Tilbake til brukerforespørsler</button>
         </div>
         <div>
-          <p id="pBold">Fornavn: {this.user.firstName} {this.user.lastName}</p>
+          <h3>{this.user.firstName} {this.user.lastName}</h3>
+          <img
+            src="img/profile.png"
+            className="profilePicture"
+            alt="Profilbilde"
+          />
+        <p id="pBold">{this.user.firstName} {this.user.lastName}</p>
 
-          <p>Addresse: {this.user.address}</p>
+          <p>{this.user.address}</p>
 
-          <p>Telefonnummer: {this.user.phonenumber}</p>
+          <p>{this.user.phonenumber}</p>
 
-          <p>Epost: {this.user.email}</p>
+          <p>{this.user.email}</p>
 
           <p>Kompetanse: {kvaliList}</p>
 
           <p>Mulige roller: {rolleList}</p>
 
-          <p>Status: {this.user.status}</p>
           <button type="button" className="btn btn-success" ref="acceptButton">Godta bruker</button>
           <button type="button" className="btn btn-danger" ref="denyButton">Avslå bruker</button>
         </div>
@@ -1226,39 +1220,38 @@ class DeletedProfileAdminAccess extends React.Component {
   render() {
     let rolleList = [];
     for (let rolle of this.rolle) {
-      rolleList.push(<li key={rolle}>{rolle}</li>);
+      rolleList.push(<li className="liCSS" key={rolle}>{rolle}</li>);
     }
     let kvaliList = [];
     for (let kvali of this.kvali) {
       kvaliList.push(
-        <li key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
+        <li className="liCSS" key={kvali.Competence_Name}>{kvali.Competence_Name}</li>
       );
     }
     return (
-      <div>
+      <div align="center">
         <div>
-          <button ref="adminEventButton">Arrangementer</button>
-          <button ref="userDisplayButton">Brukere </button>
-          <button ref="newUserDisplayButton">Brukerforespørsler</button>
-          <button ref="deletedUserDisplayButton">Deaktiverte brukere</button>
+          <button type="button" className="btn btn-link"ref="deletedUserDisplayButton">Tilbake til deaktiverte brukere</button>
         </div>
         <div>
-          <h2>Fornavn: {this.user.firstName}</h2>
+          <img
+            src="img/profile.png"
+            className="profilePicture"
+            alt="Profilbilde"
+          />
+          <p id="pBold">{this.user.firstName} {this.user.lastName}</p>
 
-          <h2>Etternavn: {this.user.lastName}</h2>
+            <p>{this.user.address}</p>
 
-          <h2>Addresse: {this.user.address}</h2>
+            <p>{this.user.phonenumber}</p>
 
-          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+            <p>{this.user.email}</p>
 
-          <p>Epost: {this.user.email}</p>
+            <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
 
-          <p>Kompetanse: {kvaliList}</p>
+            <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
 
-          <p>Mulige roller: {rolleList}</p>
-
-          <p>Status: {this.user.status}</p>
-          <button ref="acceptButton">Reaktiver bruker</button>
+          <button type="button" className="btn btn-success" ref="acceptButton">Reaktiver bruker</button>
         </div>
       </div>
     );
@@ -1269,17 +1262,8 @@ class DeletedProfileAdminAccess extends React.Component {
       this.user = nUser;
       this.forceUpdate();
     });
-    this.refs.adminEventButton.onclick = () => {
-      history.replace("/adminEvents/");
-    };
-    this.refs.newUserDisplayButton.onclick = () => {
-      history.replace("/newUsersDisplay/");
-    };
     this.refs.deletedUserDisplayButton.onclick = () => {
       history.replace("/deletedUsersDisplay/");
-    };
-    this.refs.userDisplayButton.onclick = () => {
-      history.replace("/usersDisplay/");
     };
     this.refs.acceptButton.onclick = () => {
       userService.acceptUser(this.user.ID, result => {
@@ -1573,7 +1557,7 @@ class EventPersonnel extends React.Component {
             {pointUser.firstName}
             {pointUser.lastname}
           </Link>
-          <div>Points: {pointUser.points}</div>
+          <div>Poeng: {pointUser.points}</div>
           <div>Aktuelle roller: {pointUser.rolleList}</div>
           <button
             type="button"
@@ -1593,7 +1577,7 @@ class EventPersonnel extends React.Component {
             {leastPointUser.firstName}
             {leastPointUser.lastname}
           </Link>
-          <div>Points: {leastPointUser.points}</div>
+          <div>Poeng: {leastPointUser.points}</div>
           <div>Aktuelle roller: {leastPointUser.rolleList}</div>
           <button
             type="button"
@@ -1612,7 +1596,7 @@ class EventPersonnel extends React.Component {
           <Link to={"/eventDetails/" + usedUser.ID + ""}>
             {usedUser.firstName} {usedUser.lastname}
           </Link>
-          <div>Points: {usedUser.points}</div>
+          <div>Poeng: {usedUser.points}</div>
           <div>Aktuelle roller: {usedUser.rolleList}</div>
           <div>Status: {usedUser.confirmation}</div>
           <button
@@ -1647,8 +1631,8 @@ class EventPersonnel extends React.Component {
           {listLeastPointUsers}
         </div>
         <div>
-          <h2>Registrete brukere for dette arrangementet</h2>
-          <h4>Liste over medlemmer som er registret for dette arrangementet</h4>
+          <h2>Registrerte brukere for dette arrangementet</h2>
+          <p>Liste over medlemmer som er registret for dette arrangementet</p>
           {listUsedUsers}
         </div>
       </div>
@@ -1827,7 +1811,7 @@ class Events extends React.Component {
             Tilbake til hovedmeny
           </button>
           <h3>Arrangementer</h3>
-          <p id="vaktpoengDiv">Dine vakt poeng: {this.user.points}</p>
+          <p id="vaktpoengDiv">Dine vaktpoeng: {this.user.points}</p>
         </div>
         <div className="spacingDiv3">{listEvents}</div>
       </div>
@@ -1901,7 +1885,7 @@ class UserEventDetails extends React.Component {
             </button>
             <div id="interestInEvent" />
           </div>
-          <p id="pBold">Dine vakt poeng: {this.user.points}</p>
+          <p id="pBold">Dine vaktpoeng: {this.user.points}</p>
         </div>
       </div>
     );
@@ -1972,39 +1956,31 @@ class CreateEvent extends React.Component {
         <div>
           <h3>Opprett arrangement</h3>
 
-          <p>Navn på arrangement:</p>
-          <input type="text" ref="nEventname" />
+          <input type="text" placeholder="Arrangementnavn"ref="nEventname" />
           <div id="EventnameError" />
-          <p>Beskrivelse:</p>
-          <input type="text" ref="nDescription" />
+            <textarea placeholder="Beskrivelse" ref="nDescription" rows="4" cols="19" />
           <div id="DescriptionError" />
         </div>
-        <p>Møtepunkt:</p>
-        <input type="text" ref="nMeetingpoint" />
+        <p id="pBold">Møtepunkt</p>
+        <input type="text" placeholder="Adresse" ref="nMeetingpoint" />
         <div id="MeetingpointError" />
-        <p>Kontaktperson:</p>
-        <input type="text" ref="nContactperson" />
+        <input type="text" placeholder="Kartlenke"ref="nMap" />
+        <div id="MapError" />
+        <p id="pBold">Kontaktperson:</p>
+        <input type="text" placeholder="Navn"ref="nContactperson" />
         <div id="ContactpersonError" />
-        <p>Telefonnummer kontaktperson:</p>
-        <input type="text" ref="nPhonenumberContactperson" />
+        <input type="text" placeholder="Telefonnummer"ref="nPhonenumberContactperson" />
         <div id="PhonenumberContactpersonError" />
-        <p>Dato:</p>
+        <p id="pBold">Tid:</p>
         <input type="date" ref="nDate" />
         <div id="DateError" />
-        <p>Start- og slutt tid:</p>
-        <input type="time" ref="nStartTime" />
-        <div id="StartTimeError" />
-        <input type="time" ref="nEndTime" />
-        <div id="EndTimeError" />
-        <p>Kartlenke:</p>
-        <input type="text" ref="nMap" />
-        <div id="MapError" />
+          <input type="time" ref="nStartTime" />
+          <div id="StartTimeError" />
+          <input type="time" ref="nEndTime" />
+          <div id="EndTimeError" />
         <p>Utstyrsliste:</p>
         <input type="text" ref="nEquipmentlist" />
         <div id="EquipmentlistError" />
-        <p>Adresse:</p>
-        <input type="text" ref="nEventAdress" />
-        <div id="EventAdress" />
         <div id="addEventError" />
         <button type="button" className="btn btn-success" ref="addEventButton">
           Opprett arrangement
