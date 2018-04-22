@@ -891,6 +891,10 @@ class UsersDisplay extends React.Component {
       this.aUsers = result;
       this.forceUpdate();
     });
+    userService.getInactiveUsers(result => {
+      this.iUsers = result;
+      this.forceUpdate();
+    });
     this.refs.newUserDisplayButton.onclick = () => {
       history.replace("/newUsersDisplay/");
     };
