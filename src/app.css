@@ -236,7 +236,23 @@ font-size: x-large;
   margin-bottom: 2%;
 }
 
-#arrangementname {
+.redBold {
+  font-weight: bold;
+  color: red;
+  margin-bottom: 1%;
+}
+
+.redBold2 {
+  font-weight: bold;
+  color: red;
+
+}
+
+#createEventButtonCSS {
+  margin-top: -0.2%;
+}
+
+.arrangementname {
   margin-bottom: 2%;
 }
 
@@ -245,8 +261,13 @@ font-size: x-large;
 }
 
 #buttonMainScreenAdmin {
-  font-size: 18px;
+  font-size: 22px;
   margin-bottom: 3.5%;
+}
+
+#buttonMainScreenAdmin:hover {
+  color: red;
+    transition: 0.3s;
 }
 
 #otherUsersList {

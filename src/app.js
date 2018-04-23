@@ -760,7 +760,7 @@ class UserProfileAdmin extends React.Component {
           </div>
         </div>
         <div>
-          <button type="button" className="btn btn-default" ref="userDisplayButton">Brukerhåndtering</button>
+          <button type="button" id="buttonMainScreenAdmin" className="btn btn-default" ref="userDisplayButton">Brukerhåndtering</button>
         </div>
       </div>
     );
@@ -1612,13 +1612,7 @@ class EventPersonnel extends React.Component {
     return (
       <div align="center">
         <div>
-          <button
-            type="button"
-            className="btn btn-link"
-            ref="backToEventButton"
-          >
-            Tilbake til arrangement
-          </button>
+          <button type="button" className="btn btn-link" ref="backToEventButton">Tilbake til arrangement</button>
         </div>
         <div>
           <h3>Interesserte brukere:</h3>
@@ -1955,8 +1949,8 @@ class CreateEvent extends React.Component {
         <div>
           <h3>Opprett arrangement</h3>
 
-            <input type="text" id="arrangementname"placeholder="Navn på arrangement" ref="nEventname" />
-            <div id="EventnameError" />
+            <input type="text" placeholder="Navn på arrangement" ref="nEventname" />
+            <div className="arrangementname" id="EventnameError" />
             <p className="arrangementTime" id="pBold">Tid:</p>
             <input type="date" ref="nDate" />
             <div id="DateError" />
@@ -1980,12 +1974,10 @@ class CreateEvent extends React.Component {
         <div id="PhonenumberContactpersonError" />
 
         <p className="arrangementEquipmentlist" id="pBold">Utstyrsliste:</p>
-        <input type="text" ref="nEquipmentlist" />
+        <textarea ref="nEquipmentlist" rows="4" cols="19" />
         <div id="EquipmentlistError" />
-        <div id="addEventError" />
-        <button type="button" className="btn btn-success" ref="addEventButton">
-          Opprett arrangement
-        </button>
+        <div className="redBold" id="addEventError" />
+        <button type="button" id="createEventButtonCSS" className="btn btn-success" ref="addEventButton">Opprett arrangement</button>
       </div>
     );
   }
@@ -2307,7 +2299,7 @@ class CreateUser extends React.Component {
           />
           <div id="passwordError2" />
 
-          <div id="addUserError" />
+          <div className="redBold2" id="addUserError" />
           <button
             id="blimedlemCSS"
             type="button"
