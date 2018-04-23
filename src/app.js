@@ -246,10 +246,10 @@ class UserProfile extends React.Component {
               {event.Arrangement_Name}
             </Link>
           </div>
-          <button onClick={() => this.confirmUserForEvent(event.ID)}>
+          <button type="button" className="btn btn-success" onClick={() => this.confirmUserForEvent(event.ID)}>
             Bekreft deltagelse
           </button>
-          <button onClick={() => this.denyUserForEvent(event.ID)}>
+          <button type="button" className="btn btn-danger" onClick={() => this.denyUserForEvent(event.ID)}>
             Avkreft deltagelse
           </button>
         </li>
@@ -284,7 +284,7 @@ class UserProfile extends React.Component {
             <p>{this.user.email}</p>
 
             <p>{this.user.phonenumber}</p>
-            <br />
+            <hr />
 
             <p>Kompetanse: {kvaliList}</p>
 
@@ -937,9 +937,9 @@ class ProfileAdminAccess extends React.Component {
           <p>{this.user.email}</p>
           <hr />
 
-          <p>Kompetanse: {kvaliList}</p>
+          <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
 
-          <p>Mulige roller: {rolleList}</p>
+          <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
 
           <button
             type="button"
@@ -1264,8 +1264,8 @@ class DeletedProfileAdminAccess extends React.Component {
           <p>{this.user.phonenumber}</p>
           <p>{this.user.email}</p>
           <hr />
-          <p>Kompetanse:{kvaliList}</p>
-          <p>Mulige roller:{rolleList}</p>
+          <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
+          <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
           <button type="button" className="btn btn-success" ref="acceptButton">
             Reaktiver bruker
           </button>
@@ -1682,34 +1682,37 @@ class ChangeEvent extends React.Component {
           <p>Navn på arrangement: {this.event.arrangement_Name}</p>
           <input type="text" ref="nEventname" />
           <div id="EventnameError" />
-          <p>Beskrivelse: {this.event.description}</p>
-          <textarea  ref="nDescription" rows="4" cols="19" />
+          <p id="pBold">Tid:</p>
+            <p>Dato: {this.meetingdate}</p>
+            <input type="date" ref="nDate" />
+            <div id="DateError" />
+            <p>Start- og slutt tid: {this.event.start_time}</p>
+            <input type="time" ref="nStartTime" />
+            <div id="StartTimeError" />
+            <p>{this.event.end_time}</p>
+            <input type="time" ref="nEndTime" />
+            <div id="EndTimeError" />
+          <p>Beskrivelse: </p>
+          <textarea  placeholder={this.event.description} ref="nDescription" rows="4" cols="19" />
           <div id="DescriptionError" />
-          <p>Møtepunkt: {this.event.meetingpoint}</p>
+          <p id="pBold">Møtested</p>
+          <p>Adresse: {this.event.meetingpoint}</p>
           <input type="text" ref="nMeetingpoint" />
           <div id="MeetingpointError" />
+            <p>Kartlenke: {this.event.map_Link}</p>
+            <input type="text" ref="nMap" />
+            <div id="MapError" />
           <p>Kontaktperson: {this.event.contact_Name}</p>
           <input type="text" ref="nContactperson" />
           <div id="ContactpersonError" />
           <p>Telefonnummer kontaktperson: {this.event.contact_phonenumber}</p>
           <input type="text" ref="nPhonenumberContactperson" />
           <div id="PhonenumberContactpersonError" />
-          <p>Dato: {this.meetingdate}</p>
-          <input type="date" ref="nDate" />
-          <div id="DateError" />
-          <p>Start- og slutt tid: {this.event.start_time}</p>
-          <input type="time" ref="nStartTime" />
-          <div id="StartTimeError" />
-          <p>{this.event.end_time}</p>
-          <input type="time" ref="nEndTime" />
-          <div id="EndTimeError" />
-          <p>Kartlenke: {this.event.map_Link}</p>
-          <input type="text" ref="nMap" />
-          <div id="MapError" />
-          <h3>Utstyrsliste: {this.event.equipmentlist}</h3>
-          <textarea  ref="nEquipmentlist" rows="4" cols="19" />
+
+          <p>Utstyrsliste: {this.event.equipmentlist}</p>
+          <textarea ref="nEquipmentlist" rows="4" cols="19" />
           <div id="EquipmentlistError" />
-          <button ref="changeEventButton">Oppdater arrangement</button>
+          <button type="button" className="btn btn-success" ref="changeEventButton">Oppdater arrangement</button>
         </div>
       </div>
     );
@@ -1760,8 +1763,9 @@ class ChangeEventSuccess extends React.Component {
     return (
       <div align="center">
         <div>
-          <h3>Dine endringer er oppdatert!</h3>
-          <button ref="backToEventButton">Tilbake til arrangementer</button>
+          <button type="button" className="btn btn-link" ref="backToEventButton">Tilbake til arrangementer</button>
+          <h3>Suksess!</h3>
+          <p>Arrangementet ble oppdatert.</p>
         </div>
       </div>
     );
