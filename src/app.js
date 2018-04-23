@@ -246,19 +246,13 @@ class UserProfile extends React.Component {
     let eventList = [];
     for (let event of this.events) {
       eventList.push(
-        <li className="liCSS" key={event.ID}>
+        <li id="pBold" className="liCSS" key={event.ID}>
           <div>
             <Link to={"/userEventDetails/:" + event.ID + ""}>
               {event.Arrangement_Name}
             </Link>
           </div>
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => this.confirmUserForEvent(event.ID)}
-          >
-            Bekreft deltagelse
-          </button>
+          <button type="button" className="btn btn-success" onClick={() => this.confirmUserForEvent(event.ID)}>Bekreft deltagelse</button>
           <button
             type="button"
             className="btn btn-danger"
@@ -281,6 +275,7 @@ class UserProfile extends React.Component {
           </button>
           <h3>Din profil:</h3>
         </div>
+        <p>Vaktpoeng: {this.user.points}</p>
         <div id="UserCallout">{eventList}</div>
         <div>
           <img
@@ -300,21 +295,23 @@ class UserProfile extends React.Component {
             <p>{this.user.phonenumber}</p>
             <hr />
 
-            <p>Kompetanse: {kvaliList}</p>
+            <p id="pBold">Kompetanse:</p>
+            <p className="liCSS" id="spacing2">{kvaliList}</p>
 
-            <p>Mulige roller: {rolleList}</p>
+            <p className="spacing3" id="pBold">Mulige roller:</p>
+              <p className="liCSS" id="spacing2">{rolleList}</p>
 
-            <p>Status: {this.user.status}</p>
+            <p id="pBold">Brukerstatus: {this.user.status}</p>
 
             <button
               type="button"
               className="btn btn-warning"
               ref="activatePassiveButton"
             >
-              Endre status
-            </button>
+              Endre brukerstatus
+            </button> <div></div>
 
-            <p>Vaktpoeng: {this.user.points}</p>
+
             <button
               type="button"
               className="btn btn-basic"
@@ -1414,7 +1411,7 @@ class EventDetails extends React.Component {
       this.meetingdate = this.event.meetingdate.toDateString();
     }
     return (
-      <div align="center">
+      <div align="center" className="eventDetailsCSS">
         <div>
           <button
             type="button"
@@ -1869,7 +1866,6 @@ class ChangeEvent extends React.Component {
           <div className="arrangementTime" id="EndTimeError" />
           <p id="pBold" className="arrangementDescription">Ny beskrivelse: </p>
           <textarea
-            placeholder={this.event.description}
             ref="nDescription"
             rows="6"
             cols="30"
