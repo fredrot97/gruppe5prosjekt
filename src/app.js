@@ -935,6 +935,7 @@ class ProfileAdminAccess extends React.Component {
           <p>{this.user.phonenumber}</p>
 
           <p>{this.user.email}</p>
+          <hr />
 
           <p>Kompetanse: {kvaliList}</p>
 
@@ -1262,8 +1263,9 @@ class DeletedProfileAdminAccess extends React.Component {
           <p>{this.user.address}</p>
           <p>{this.user.phonenumber}</p>
           <p>{this.user.email}</p>
-          <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
-          <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
+          <hr />
+          <p>Kompetanse:{kvaliList}</p>
+          <p>Mulige roller:{rolleList}</p>
           <button type="button" className="btn btn-success" ref="acceptButton">
             Reaktiver bruker
           </button>
@@ -1671,40 +1673,41 @@ class ChangeEvent extends React.Component {
       this.meetingdate = this.event.meetingdate.toDateString();
     }
     return (
-      <div>
+      <div align="center">
         <div>
-          <button ref="backToEventButton">Arrangementer</button>
+          <button type="button" className="btn btn-link" ref="backToEventButton">Tilbake til arrangementer</button>
         </div>
         <div>
-          <h2>Navn på arrangement: {this.event.arrangement_Name}</h2>
+          <h3>Endre arrangement</h3>
+          <p>Navn på arrangement: {this.event.arrangement_Name}</p>
           <input type="text" ref="nEventname" />
           <div id="EventnameError" />
-          <h2>Beskrivelse: {this.event.description}</h2>
-          <input type="text" ref="nDescription" />
+          <p>Beskrivelse: {this.event.description}</p>
+          <textarea  ref="nDescription" rows="4" cols="19" />
           <div id="DescriptionError" />
-          <h2>Møtepunkt: {this.event.meetingpoint}</h2>
+          <p>Møtepunkt: {this.event.meetingpoint}</p>
           <input type="text" ref="nMeetingpoint" />
           <div id="MeetingpointError" />
-          <h2>Kontaktperson: {this.event.contact_Name}</h2>
+          <p>Kontaktperson: {this.event.contact_Name}</p>
           <input type="text" ref="nContactperson" />
           <div id="ContactpersonError" />
-          <h2>Telefonnummer kontaktperson: {this.event.contact_phonenumber}</h2>
+          <p>Telefonnummer kontaktperson: {this.event.contact_phonenumber}</p>
           <input type="text" ref="nPhonenumberContactperson" />
           <div id="PhonenumberContactpersonError" />
-          <h2>Dato: {this.meetingdate}</h2>
+          <p>Dato: {this.meetingdate}</p>
           <input type="date" ref="nDate" />
           <div id="DateError" />
-          <h2>Start- og slutt tid: {this.event.start_time}</h2>
+          <p>Start- og slutt tid: {this.event.start_time}</p>
           <input type="time" ref="nStartTime" />
           <div id="StartTimeError" />
-          <h2>{this.event.end_time}</h2>
+          <p>{this.event.end_time}</p>
           <input type="time" ref="nEndTime" />
           <div id="EndTimeError" />
-          <h2>Link til kart: {this.event.map_Link}</h2>
+          <p>Kartlenke: {this.event.map_Link}</p>
           <input type="text" ref="nMap" />
           <div id="MapError" />
-          <h2>Utstyrsliste: {this.event.equipmentlist}</h2>
-          <input type="text" ref="nEquipmentlist" />
+          <h3>Utstyrsliste: {this.event.equipmentlist}</h3>
+          <textarea  ref="nEquipmentlist" rows="4" cols="19" />
           <div id="EquipmentlistError" />
           <button ref="changeEventButton">Oppdater arrangement</button>
         </div>
