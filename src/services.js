@@ -5,7 +5,7 @@ let connection;
 
 function connect() {
   connection = mysql.createConnection({
-    host: "mysql.stud.iie.ntnu.no",
+    host: "",
     user: "",
     password: "",
     database: ""
