@@ -1856,43 +1856,37 @@ class ChangeEvent extends React.Component {
         </div>
         <div>
           <h3>Endre arrangement</h3>
-          <p>Navn på arrangement: {this.event.arrangement_Name}</p>
-          <input type="text" ref="nEventname" />
-          <div id="EventnameError" />
-          <p id="pBold">Tid:</p>
-          <p>Dato: {this.meetingdate}</p>
+
+          <input placeholder="Nytt navn" type="text" ref="nEventname" />
+          <div className="arrangementname" id="EventnameError" />
+          <p className="arrangementTime" id="pBold">Ny tid:</p>
           <input type="date" ref="nDate" />
           <div id="DateError" />
-          <p>Start- og slutt tid: {this.event.start_time}</p>
           <input type="time" ref="nStartTime" />
           <div id="StartTimeError" />
-          <p>{this.event.end_time}</p>
+          <p id="spacing">til</p>
           <input type="time" ref="nEndTime" />
-          <div id="EndTimeError" />
-          <p>Beskrivelse: </p>
+          <div className="arrangementTime" id="EndTimeError" />
+          <p id="pBold" className="arrangementDescription">Ny beskrivelse: </p>
           <textarea
             placeholder={this.event.description}
             ref="nDescription"
-            rows="4"
-            cols="19"
+            rows="6"
+            cols="30"
           />
           <div id="DescriptionError" />
-          <p id="pBold">Møtested</p>
-          <p>Adresse: {this.event.meetingpoint}</p>
-          <input type="text" ref="nMeetingpoint" />
+          <p className="arrangementMeetingpoint" id="pBold">Møtested</p>
+          <input type="text" placeholder="Ny adresse" ref="nMeetingpoint" />
           <div id="MeetingpointError" />
-          <p>Kartlenke: {this.event.map_Link}</p>
-          <input type="text" ref="nMap" />
+          <input type="text" placeholder="Ny kartlenke" ref="nMap" />
           <div id="MapError" />
-          <p>Kontaktperson: {this.event.contact_Name}</p>
-          <input type="text" ref="nContactperson" />
+          <p className="arrangementContactperson" id="pBold">Kontaktperson: {this.event.contact_Name}</p>
+          <input type="text" placeholder="Nytt navn" ref="nContactperson" />
           <div id="ContactpersonError" />
-          <p>Telefonnummer kontaktperson: {this.event.contact_phonenumber}</p>
-          <input type="text" ref="nPhonenumberContactperson" />
+          <input type="text" placeholder="Nytt telefonnummer" ref="nPhonenumberContactperson" />
           <div id="PhonenumberContactpersonError" />
-
-          <p>Utstyrsliste: {this.event.equipmentlist}</p>
-          <textarea ref="nEquipmentlist" rows="4" cols="19" />
+          <p className="arrangementEquipmentlist" id="pBold">Ny utstyrsliste:</p>
+          <textarea ref="nEquipmentlist" rows="6" cols="30" />
           <div id="EquipmentlistError" />
           <button
             type="button"
@@ -2168,7 +2162,7 @@ class CreateEvent extends React.Component {
           <p className="arrangementDescription" id="pBold">
             Beskrivelse:
           </p>
-          <textarea ref="nDescription" rows="4" cols="19" />
+          <textarea ref="nDescription" rows="6" cols="30" />
           <div id="DescriptionError" />
         </div>
         <p className="arrangementMeetingpoint" id="pBold">
@@ -2193,7 +2187,7 @@ class CreateEvent extends React.Component {
         <p className="arrangementEquipmentlist" id="pBold">
           Utstyrsliste:
         </p>
-        <textarea ref="nEquipmentlist" rows="4" cols="19" />
+        <textarea ref="nEquipmentlist" rows="6" cols="30" />
         <div id="EquipmentlistError" />
         <div className="redBold" id="addEventError" />
         <button
