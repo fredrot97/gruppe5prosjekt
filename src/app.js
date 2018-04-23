@@ -240,7 +240,7 @@ class UserProfile extends React.Component {
     let eventList = [];
     for (let event of this.events) {
       eventList.push(
-        <li key={event.ID}>
+        <li className="liCSS" key={event.ID}>
           <div>
             <Link to={"/userEventDetails/:" + event.ID + ""}>
               {event.Arrangement_Name}
@@ -472,15 +472,15 @@ class ChangeProfile extends React.Component {
           </button>
         </div>
         <div>
-          <h2>Fornavn: {this.user.firstName}</h2>
+          <h3>Fornavn: {this.user.firstName}</h3>
           <input type="text" ref="changeFirstName" />
-          <h2>Etternavn: {this.user.lastName}</h2>
+          <h3>Etternavn: {this.user.lastName}</h3>
           <input type="text" ref="changeLastName" />
-          <h2>Addresse: {this.user.address}</h2>
+          <h3>Addresse: {this.user.address}</h3>
           <input type="text" ref="changeAddress" />
-          <h2>Telefonnummer: {this.user.phonenumber}</h2>
+          <h3>Telefonnummer: {this.user.phonenumber}</h3>
           <input type="text" ref="changePhonenumber" />
-          <h2>Kompetanse: </h2>
+          <h3>Ny kompetanse: </h3>
           <select ref="addCompetence">
             <option value="">Ingen</option>
             <optgroup label="Førerkort">
@@ -760,13 +760,7 @@ class UserProfileAdmin extends React.Component {
           </div>
         </div>
         <div>
-          <button
-            type="button"
-            className="btn btn-default"
-            ref="userDisplayButton"
-          >
-            Brukerhåndtering
-          </button>
+          <button type="button" className="btn btn-default" ref="userDisplayButton">Brukerhåndtering</button>
         </div>
       </div>
     );
@@ -812,8 +806,7 @@ class UsersDisplay extends React.Component {
       listInactiveUsers.push(
         <li className="liCSS" key={user.ID}>
           <Link to={"/profileAdminAccess/" + user.ID + ""}>
-            {user.firstName}
-            {user.lastName}
+            {user.firstName} {user.lastName}
           </Link>
         </li>
       );
@@ -857,7 +850,7 @@ class UsersDisplay extends React.Component {
           {listUsers}
         </div>
         <div>
-          <h3>Inaktive brukere</h3>
+          <h3 className="spacingDiv5">Inaktive brukere</h3>
           {listInactiveUsers}
         </div>
       </div>
@@ -1342,7 +1335,7 @@ class AdminEvents extends React.Component {
           >
             +Opprett arrangement
           </button>
-          <h3>Arrangementer:</h3>
+          <h3>Arrangementer</h3>
         </div>
         <div>{listEvents}</div>
       </div>
@@ -1581,13 +1574,8 @@ class EventPersonnel extends React.Component {
           </Link>
           <div>Poeng: {pointUser.points}</div>
           <div>Aktuelle roller: {pointUser.rolleList}</div>
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => this.addUserToEvent(pointUser.ID)}
-          >
-            Legg til
-          </button>
+          <button type="button" className="btn btn-success" onClick={() => this.addUserToEvent(pointUser.ID)}>Legg til</button>
+          <div className="spacingDiv6"></div>
         </li>
       );
     }
@@ -1601,13 +1589,8 @@ class EventPersonnel extends React.Component {
           </Link>
           <div>Poeng: {leastPointUser.points}</div>
           <div>Aktuelle roller: {leastPointUser.rolleList}</div>
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => this.addUserToEvent(leastPointUser.ID)}
-          >
-            Legg til
-          </button>
+          <button type="button" className="btn btn-success" onClick={() => this.addUserToEvent(leastPointUser.ID)}>Legg til</button>
+            <div className="spacingDiv6"></div>
         </li>
       );
     }
@@ -1621,13 +1604,8 @@ class EventPersonnel extends React.Component {
           <div>Poeng: {usedUser.points}</div>
           <div>Aktuelle roller: {usedUser.rolleList}</div>
           <div>Status: {usedUser.confirmation}</div>
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={() => this.removeUserFromEvent(usedUser.ID)}
-          >
-            Fjern
-          </button>
+          <button type="button" className="btn btn-danger" onClick={() => this.removeUserFromEvent(usedUser.ID)}>Fjern</button>
+          <div className="spacingDiv6"></div>
         </li>
       );
     }
@@ -1644,12 +1622,12 @@ class EventPersonnel extends React.Component {
         </div>
         <div>
           <h3>Interesserte brukere:</h3>
-          <p>Liste over interesserte medlemmer etter flest vaktpoeng:</p>
+          <p>Liste over interesserte medlemmer sortert etter flest vaktpoeng</p>
           {listPointUsers}
         </div>
         <div>
           <h2>Aktuelle brukere:</h2>
-          <p>Liste over medlemmer med minst antall vaktpoeng:</p>
+          <p>Liste over medlemmer med minst antall vaktpoeng</p>
           {listLeastPointUsers}
         </div>
         <div>
@@ -1783,11 +1761,10 @@ class ChangeEventSuccess extends React.Component {
   }
   render() {
     return (
-      <div>
+      <div align="center">
         <div>
-          <h2>Dine endringer er oppdatert!</h2>
-          <h4>Tilbake til arrangementer:</h4>
-          <button ref="backToEventButton">Arrangementer</button>
+          <h3>Dine endringer er oppdatert!</h3>
+          <button ref="backToEventButton">Tilbake til arrangementer</button>
         </div>
       </div>
     );
@@ -1978,31 +1955,31 @@ class CreateEvent extends React.Component {
         <div>
           <h3>Opprett arrangement</h3>
 
-            <input type="text" placeholder="Arrangementnavn"ref="nEventname" />
+            <input type="text" id="arrangementname"placeholder="Navn på arrangement" ref="nEventname" />
             <div id="EventnameError" />
-            <p id="pBold">Tid:</p>
+            <p className="arrangementTime" id="pBold">Tid:</p>
             <input type="date" ref="nDate" />
             <div id="DateError" />
               <input type="time" ref="nStartTime" />
               <div id="StartTimeError" />
               <input type="time" ref="nEndTime" />
               <div id="EndTimeError" />
-              <p id="pBold">Beskrivelse</p>
+              <p className="arrangementDescription" id="pBold">Beskrivelse:</p>
             <textarea  ref="nDescription" rows="4" cols="19" />
           <div id="DescriptionError" />
         </div>
-        <p id="pBold">Møtepunkt</p>
+        <p className="arrangementMeetingpoint"id="pBold">Møtepunkt:</p>
         <input type="text" placeholder="Adresse" ref="nMeetingpoint" />
         <div id="MeetingpointError" />
         <input type="text" placeholder="Kartlenke"ref="nMap" />
         <div id="MapError" />
-        <p id="pBold">Kontaktperson:</p>
+        <p className="arrangementContactperson" id="pBold">Kontaktperson:</p>
         <input type="text" placeholder="Navn"ref="nContactperson" />
         <div id="ContactpersonError" />
         <input type="text" placeholder="Telefonnummer"ref="nPhonenumberContactperson" />
         <div id="PhonenumberContactpersonError" />
 
-        <p>Utstyrsliste:</p>
+        <p className="arrangementEquipmentlist" id="pBold">Utstyrsliste:</p>
         <input type="text" ref="nEquipmentlist" />
         <div id="EquipmentlistError" />
         <div id="addEventError" />
@@ -2147,15 +2124,15 @@ class EventConfirmation extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="eventConfirmationCSS" align="center">
         <div>
-          <button ref="backToAdminEventsButton">
+          <button type="button" className="btn btn-link" ref="backToAdminEventsButton">
             Tilbake til arrangementer
           </button>
         </div>
         <div>
-          <h2>Arrangementet ditt har blitt lagt inn!</h2>
-          <h4>Du vil motta en email når søknaden din har blitt behandlet.</h4>
+          <h3>Suksess!</h3>
+          <p>Arrangementet ble opprettet.</p>
         </div>
       </div>
     );
@@ -2355,7 +2332,7 @@ class CreateUser extends React.Component {
         this.refs.nFirstname.value == ""
       ) {
         isValidInput = false;
-        document.getElementById("fnameError").textContent = "Ugyldig navn.";
+        document.getElementById("fnameError").textContent = "Ugyldig fornavn.";
       } else {
         document.getElementById("fnameError").textContent = "";
       }
@@ -2366,7 +2343,7 @@ class CreateUser extends React.Component {
         this.refs.nLastname.value == ""
       ) {
         isValidInput = false;
-        document.getElementById("lnameError").textContent = "Ugyldig navn.";
+        document.getElementById("lnameError").textContent = "Ugyldig etternavn.";
       } else {
         document.getElementById("lnameError").textContent = "";
       }

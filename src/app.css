@@ -9,6 +9,15 @@
   transform: translate(-50%, -50%);
 }
 
+.eventConfirmationCSS {
+    position: fixed;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
 .createUserCSS {
   position: fixed;
   background-color: white;
@@ -179,6 +188,30 @@ font-size: x-large;
   margin-top: 2%;
 }
 
+.arrangementDescription {
+  margin-top: 3%;
+  margin-bottom: 0%;
+}
+
+.arrangementMeetingpoint {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementContactperson {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementEquipmentlist {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementTime {
+  margin-bottom: 0%;
+}
+
 .spacingDiv {
   margin-top: 4%;
 }
@@ -195,6 +228,17 @@ font-size: x-large;
   margin-top: 10%;
 }
 
+.spacingDiv5 {
+  margin-top: 2%;
+}
+
+.spacingDiv6 {
+  margin-bottom: 2%;
+}
+
+#arrangementname {
+  margin-bottom: 2%;
+}
 
 #usersHeader {
   margin-top: 3%;
