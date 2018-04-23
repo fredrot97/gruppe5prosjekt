@@ -971,8 +971,11 @@ class ProfileAdminAccess extends React.Component {
           <p>{this.user.phonenumber}</p>
           <p>{this.user.email}</p>
           <hr />
-          <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
-          <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
+            <p id="pBold">Kompetanse:</p>
+            <p className="liCSS" id="spacing2">{kvaliList}</p>
+
+            <p className="spacing3" id="pBold">Mulige roller:</p>
+              <p className="liCSS" id="spacing2">{rolleList}</p>
           <button
             type="button"
             className="btn btn-danger"
@@ -1296,8 +1299,11 @@ class DeletedProfileAdminAccess extends React.Component {
           <p>{this.user.phonenumber}</p>
           <p>{this.user.email}</p>
           <hr />
-          <p id="pBold">Kompetanse:</p> <p>{kvaliList}</p>
-          <p id="pBold">Mulige roller:</p> <p>{rolleList}</p>
+            <p id="pBold">Kompetanse:</p>
+            <p className="liCSS" id="spacing2">{kvaliList}</p>
+
+            <p className="spacing3" id="pBold">Mulige roller:</p>
+              <p className="liCSS" id="spacing2">{rolleList}</p>
           <button type="button" className="btn btn-success" ref="acceptButton">
             Reaktiver bruker
           </button>
