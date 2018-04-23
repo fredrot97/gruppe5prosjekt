@@ -247,7 +247,13 @@ font-size: x-large;
   margin-top: 3%;
 }
 
+.spacing4 {
+  margin-top: 2%;
+}
 
+.spacingDiv7 {
+  margin-top: 2%;
+}
 
 .redBold {
   font-weight: bold;
@@ -266,6 +272,14 @@ font-size: x-large;
 
 #spacing2 {
   margin-top: -2%;
+}
+
+#spacing5 {
+  margin-top: 1.5%;
+}
+
+#spacing6 {
+  margin-bottom: 1%;
 }
 
 #createEventButtonCSS {

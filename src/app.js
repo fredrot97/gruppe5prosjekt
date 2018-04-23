@@ -489,16 +489,15 @@ class ChangeProfile extends React.Component {
           </button>
         </div>
         <div>
-          <h3>Fornavn: {this.user.firstName}</h3>
-          <input type="text" ref="changeFirstName" />
-          <h3>Etternavn: {this.user.lastName}</h3>
-          <input type="text" ref="changeLastName" />
-          <h3>Addresse: {this.user.address}</h3>
-          <input type="text" ref="changeAddress" />
-          <h3>Telefonnummer: {this.user.phonenumber}</h3>
-          <input type="text" ref="changePhonenumber" />
-          <h3>Ny kompetanse: </h3>
-          <select ref="addCompetence">
+          <h3>Endre detaljer</h3>
+          <p id="pBold">Navn:</p>
+          <input type="text" placeholder="Nytt fornavn" ref="changeFirstName" /> <div></div>
+          <input type="text" placeholder="Nytt etternavn" ref="changeLastName" />
+          <div className="spacingDiv7"><p id="pBold">Kontaktinformasjon:</p></div>
+          <input className="spacingDiv3" type="text" placeholder="Ny adresse" ref="changeAddress" /> <div></div>
+          <input type="text" placeholder="Nytt telefonnummer" ref="changePhonenumber" />
+          <p className="spacingDiv7" id="pBold">Ny kompetanse: </p>
+          <select className="spacingDiv3" ref="addCompetence">
             <option value="">Ingen</option>
             <optgroup label="Førerkort">
               <option value="Førerkort 160 utrykningskjøring">
@@ -546,12 +545,9 @@ class ChangeProfile extends React.Component {
               </option>
             </optgroup>
           </select>
-          <div>
-            <p>Gyldig fra:</p>
-          </div>
 
-          <input id="gyldighet" type="date" ref="Validity_From" />
-          <button
+            <p id="spacing6">gyldig fra:</p><input className="spacingDiv3" id="gyldighet" type="date" ref="Validity_From" /> <div></div>
+          <button id="spacing5"
             type="button"
             className="btn btn-success"
             ref="changeUserDetailsButton"
