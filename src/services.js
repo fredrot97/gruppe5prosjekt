@@ -900,8 +900,8 @@ class UserService {
   //addUserToEvent legger en bruker til et arrangement
   addUserToEvent(user_id, event_id, callback) {
     connection.query(
-      "INSERT INTO Event_Personnel (User_ID, Arrangement_ID, Role_ID, Callout_time, Confirmation) values (?, ?, ?, ?, ?)",
-      [user_id, event_id, 0, 0, "pending"],
+      "INSERT INTO Event_Personnel (User_ID, Arrangement_ID, Confirmation) values (?, ?, ?)",
+      [user_id, event_id, "pending"],
       (error, result) => {
         if (error) throw error;
         callback();
@@ -971,18 +971,8 @@ class UserService {
       }
     );
   }
-  //newPassword setter et nytt passord for en spesifikk bruker
-  newPassword(passwordEmail, callback) {
-    connection.query(
-      "SELECT * FROM Users WHERE email=? SET password =",
-      [passwordEmail],
-      (error, result) => {
-        if (error) throw error;
-      }
-    );
-  }
   //henteRolle
-  hentRolle(id, callback) {
+  getRole(id, callback) {
     let muligRolle = [];
     let kvaliArray = [];
     connection.query(
