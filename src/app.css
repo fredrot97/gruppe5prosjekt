@@ -1,0 +1,376 @@
+.loginScreenCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.eventConfirmationCSS {
+    position: fixed;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.createUserCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.userEventDetailsCSS {
+  margin: auto;
+  width: 70%;
+}
+
+.eventDetailsCSS {
+  margin: auto;
+  width: 70%;
+}
+
+
+
+.userProfileCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.userConfirmationCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.UserProfileAdminCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.changeprofileCss {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+    width: 50%;
+}
+
+.changeProfileSuccessCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.forgottenPasswordCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.contactAdminCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.otherUsersCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.mainScreenCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.EmailConfirmationCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.profileAccessCSS {
+  position: fixed;
+  background-color: white;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.brukerhåndteringCSS {
+font-size: x-large;
+}
+
+.liCSS {
+  list-style: none;
+}
+
+.liCSS2 {
+  list-style-position: outside;
+}
+
+.rk2 {
+  width: 50%;
+  height: auto;
+}
+
+.adminLogo{
+  width: 30%;
+  height: auto;
+}
+
+.profilePicture {
+  width: 13%;
+  height: auto;
+}
+
+.mainScreenLogo {
+  width: 25%;
+  height: auto;
+  margin-top: 2%;
+}
+
+.arrangementDescription {
+  margin-top: 3%;
+  margin-bottom: 0%;
+}
+
+.arrangementMeetingpoint {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementContactperson {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementEquipmentlist {
+  margin-top: 2%;
+  margin-bottom: 0%;
+}
+
+.arrangementTime {
+  margin-bottom: 0%;
+}
+
+.spacingDiv {
+  margin-top: 4%;
+}
+
+.spacingDiv2 {
+  margin-top: 2%;
+}
+
+.spacingDiv3 {
+  margin-top: -3%;
+}
+
+.spacingDiv4 {
+  margin-top: 10%;
+}
+
+.spacingDiv5 {
+  margin-top: 2%;
+}
+
+.spacingDiv6 {
+  margin-bottom: 2%;
+}
+
+.spacing3 {
+  margin-top: 3%;
+}
+
+.spacing4 {
+  margin-top: 2%;
+}
+
+.spacingDiv7 {
+  margin-top: 2%;
+}
+
+.redBold {
+  font-weight: bold;
+  color: red;
+  margin-bottom: 1%;
+}
+
+.redBold2 {
+  font-weight: bold;
+  color: red;
+}
+
+#spacing {
+  margin-bottom: 0%;
+}
+
+#spacing2 {
+  margin-top: -2%;
+}
+
+#spacing5 {
+  margin-top: 1.5%;
+}
+
+#spacing6 {
+  margin-bottom: 1%;
+}
+
+#createEventButtonCSS {
+  margin-top: -0.2%;
+}
+
+.arrangementname {
+  margin-bottom: 2%;
+}
+
+#usersHeader {
+  margin-top: 3%;
+}
+
+#buttonMainScreenAdmin {
+  font-size: 22px;
+  margin-bottom: 3.5%;
+}
+
+#buttonMainScreenAdmin:hover {
+  color: red;
+    transition: 0.3s;
+}
+
+#otherUsersList {
+  list-style: none;
+}
+
+#pBold {
+  font-weight: bold;
+}
+
+#nameCSS {
+  font-weight: bold;
+  margin-top: -2%;
+}
+
+#buttonsMainScreen {
+font-size: 24px;
+background-color: white;
+border: 1px solid black;
+margin-top: 3%;
+}
+
+#buttonsMainScreen:hover {
+  background-color: #000289;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 27px 24px 0 rgba(0,0,0,0.24), 0 20px 50px 0 rgba(0,0,0,0.19);
+}
+
+#logOutLinkCSS {
+  color: red;
+}
+
+#loginButton {
+  margin-top: 5%;
+  margin-bottom: 1%;
+}
+
+#forgottenPasswordButton {
+    margin-top: 3%;
+}
+
+#otherUsersButton {
+    margin-top: 6%;
+}
+
+#contactAdminButton {
+  margin-top: 2%;
+}
+
+#blimedlemCSS {
+  margin-top: 4%;
+}
+
+::-webkit-input-placeholder {
+   color: #808080;
+   text-align: center;
+}
+
+:-moz-placeholder {
+   color: #808080;
+   text-align: center;
+}
+
+#eventList {
+  list-style-type: none;
+border: black;
+}
+
+#vaktpoengDiv {
+  margin-bottom: 3%;
+}
